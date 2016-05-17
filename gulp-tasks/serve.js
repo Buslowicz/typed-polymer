@@ -1,7 +1,7 @@
 var gulp = require("gulp");
 var browserSync = require("browser-sync").create();
 
-var BUILD_DIR = ".build";
+var BUILD_DIR = "dist";
 
 gulp.task("serve:demo", function () {
   browserSync.init({
@@ -30,7 +30,7 @@ gulp.task("serve:docs", function () {
 
 function devWatch() {
   gulp.watch("src/**/*.scss", ["sass:dev"]);
-  gulp.watch("src/**/*.ts", ["tsc:dev"]);
+  gulp.watch("src/**/*.ts", ["webpack"]);
 
   gulp.watch([
     BUILD_DIR + "/**/*.js",

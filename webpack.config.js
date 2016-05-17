@@ -12,15 +12,17 @@ var baseConfig = {
   }
 };
 
-var devConfig = {
-  plugins: [
-    new webpack.optimize.UglifyJsPlugin({
-      compress: {
-        warnings: false
-      }
-    })
-  ]
+var devConfig = {};
+
+var prodConfig = {
+//  plugins: [
+//    new webpack.optimize.UglifyJsPlugin({
+//      compress: {
+//        warnings: false
+//      }
+//    })
+//  ]
 };
 
-module.exports.prod = baseConfig;
-module.exports.dev = devConfig;
+module.exports.prod = _.merge(baseConfig, prodConfig);
+module.exports.dev = _.merge(baseConfig, devConfig);
