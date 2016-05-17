@@ -1,0 +1,39 @@
+{
+  "name": "typed-polymer",
+  "version": "0.0.1",
+  "description": "Nothing in particular",
+  "dependencies": {
+    "Polymer": "^1.4.0",
+    "polymer-ts": "^0.1.26",
+    "webcomponents.js": "^0.7.22"
+  },
+  "devDependencies": {
+    "browser-sync": "2.11.1",
+    "del": "2.2.0",
+    "gulp": "3.9.0",
+    "gulp-autoprefixer": "3.1.0",
+    "gulp-debug": "^2.1.2",
+    "gulp-rename": "1.2.2",
+    "gulp-sass": "2.1.1",
+    "gulp-sass-lint": "1.1.1",
+    "gulp-sourcemaps": "1.6.0",
+    "gulp-tslint": "4.3.1",
+    "gulp-typedoc": "1.2.1",
+    "gulp-typescript": "2.13.0",
+    "gulp-uglify": "1.5.1",
+    "gulp-webpack": "^1.5.0",
+    "lodash": "latest",
+    "require-dir": "0.3.0",
+    "run-sequence": "1.1.5",
+    "through2": "latest",
+    "ts-loader": "^0.8.2",
+    "tslint": "3.8.1",
+    "typescript": "1.8.10",
+    "vinyl-named": "^1.1.0",
+    "webpack": "latest"
+  },
+  "scripts": {
+    "start": "gulp develop"
+  },
+  "author": "Draccoz"
+}

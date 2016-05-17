@@ -1,0 +1,63 @@
+{
+  "rules": {
+    "class-name-format": 1,
+    "clean-import-paths": 1,
+    "extends-before-declarations": 2,
+    "extends-before-mixins": 2,
+    "final-newline": 1,
+    "force-attribute-nesting": 0,
+    "force-element-nesting": 0,
+    "force-pseudo-nesting": 0,
+    "function-name-format": 1,
+    "hex-notation": [
+      2,
+      {
+        "style": "uppercase"
+      }
+    ],
+    "id-name-format": 0,
+    "indentation": [
+      2,
+      {
+        "size": 2
+      }
+    ],
+    "mixin-name-format": 1,
+    "mixins-before-declarations": [
+      2,
+      {
+        "exclude": [
+          "breakpoint",
+          "mq"
+        ]
+      }
+    ],
+    "nesting-depth": 0,
+    "no-color-keywords": 0,
+    "no-color-literals": 0,
+    "no-debug": 1,
+    "no-empty-rulesets": 1,
+    "no-ids": 0,
+    "no-important": 1,
+    "no-invalid-hex": 1,
+    "no-mergeable-selectors": 1,
+    "no-misspelled-properties": 0,
+    "no-warn": 1,
+    "placeholder-in-extend": 0,
+    "placeholder-name-format": 1,
+    "property-sort-order": 0,
+    "quotes": 1,
+    "shorthand-values": 1,
+    "space-after-bang": 1,
+    "space-after-colon": 1,
+    "space-after-comma": 1,
+    "space-around-operator": 1,
+    "space-before-bang": 1,
+    "space-before-brace": 1,
+    "space-before-colon": 1,
+    "space-between-parens": 1,
+    "trailing-semicolon": 1,
+    "variable-for-property": 0,
+    "variable-name-format": 1
+  }
+}
