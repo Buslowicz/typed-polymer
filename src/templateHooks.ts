@@ -1,5 +1,10 @@
 import * as dynamicFunctions from "./hooks/dynamicFunctions";
 
-export var templateHooks = [
+export interface TemplateHook {
+  pattern: string;
+  callback: (match: string, p: string, i?: number) => string;
+}
+
+export var templateHooks: TemplateHook[] = [
   dynamicFunctions
 ];

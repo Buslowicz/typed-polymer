@@ -1,28 +1,29 @@
-var dynamicFunctionsNames = {};
-var cached = {};
+import {TypedPolymer} from "../TSComponent";
+const NAMES = {};
+const CACHE = {};
+
+function generateFunctionName(name: string): string {
+  var idx = ++NAMES[name];
+  if (!idx) {
+    idx = NAMES[name] = 1;
+  }
+  return `_${name}_${idx}`;
+}
 
 export var pattern = "\{\{\{(.*)}}}";
 export var callback = function dynamicFunctions(match: string, p: string): string {
-  var f: any;
-  var t = <any>this;
-  var constructorName = t.prototype.constructor.name;
-  var [...attrs] = p.match(/([a-z_$][\w_$]*)/ig);
-  attrs.some(attr => {
-    if (!(attr in t.prototype.properties)) {
-      throw new SyntaxError(`Property ${attr} does not exist on the prototype of ${t.prototype.is}`);
-    }
-    return false;
-  });
+  var f: any, args = [null], t = <TypedPolymer>this;
+  var attrs = p
+    .replace(/'[^']+'/, "") // remove single quoted strings
+    .replace(/"[^"]+"/, "") // remove double quoted strings
+    .match(/([a-z_$\.][\w_$]*)/ig);  // get all words starting from a letter, _, $ or a dot
 
-  if (!(f = cached[p])) {
-    f = cached[p] = new (Function.prototype.bind.apply(Function, [null].concat(attrs).concat(`return ${p}`)));
+  if (!(f = CACHE[p])) {
+    Object.getOwnPropertyNames(t.properties || {}).forEach(property => ~attrs.indexOf(property) && args.push(property));
+    f = CACHE[p] = new (Function.prototype.bind.apply(Function, args.concat(`return ${p}`)));
   }
 
-  var dynamicFunctionNameIndex = ++dynamicFunctionsNames[constructorName];
-  if (!dynamicFunctionNameIndex) {
-    dynamicFunctionNameIndex = dynamicFunctionsNames[constructorName] = 1;
-  }
-  var functionName = `${constructorName}_${dynamicFunctionNameIndex}`;
-  t.prototype[functionName] = f;
+  var functionName = generateFunctionName(t.constructorName);
+  t[functionName] = f;
   return `[[${functionName}(${attrs.join(",")})]]`;
 };

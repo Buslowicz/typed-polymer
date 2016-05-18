@@ -3,7 +3,7 @@
   "version": false,
   "dependencies": {},
   "globalDependencies": {
-    "polymer-ts": "registry:dt/polymer-ts#0.1.25+20160404114553",
+    "polymer": "registry:dt/polymer#1.1.6+20160317120654",
     "webcomponents.js": "registry:dt/webcomponents.js#0.6.0+20160317120654"
   }
 }
