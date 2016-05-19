@@ -19,8 +19,12 @@ interface DomModule extends HTMLElement {
 }
 
 function setTemplate(proto: TypedPolymer, module: DomModule): void {
+  if (!(typeof proto.template === "string")) {
+    return;
+  }
+
   let templateElement: Element = document.createElement("template");
-  let template = proto.template;
+  let template: string = proto.template;
 
   templateHooks.forEach(hook => template = template.replace(new RegExp(hook.pattern, "g"), hook.callback.bind(proto)));
   templateElement.innerHTML = template;
@@ -28,9 +32,15 @@ function setTemplate(proto: TypedPolymer, module: DomModule): void {
   module.appendChild(templateElement);
 }
 
-function setStyles(prototype: TypedPolymer, module: DomModule): void {
-  // TODO
-  console.warn("TODO: implement setStyles");
+function setStyles(proto: TypedPolymer, module: DomModule): void {
+  if (!Array.isArray(proto.styles)) {
+    return;
+  }
+  proto.styles.forEach(style => {
+    let styleElement: HTMLStyleElement = document.createElement("style");
+    styleElement.innerHTML = style;
+    module.appendChild(styleElement);
+  });
 }
 
 function createDomModule() {
@@ -90,8 +100,7 @@ export function behaviors(behaviors: Object[]): ClassDecorator {
 function setTypeValue(options: polymer.PropObjectType, value: any) {
   let types: Function[] = [String, Boolean, Number, Date, Array];
   if (!value) {
-    options.value = null;
-    return;
+    return options.value = null;
   }
   if (~types.indexOf(value)) {
     options.type = value;
@@ -106,70 +115,20 @@ function setTypeValue(options: polymer.PropObjectType, value: any) {
   }
 }
 
-export function prop(value: any, options: polymer.PropObjectType = <polymer.PropObjectType>{}): PropertyDecorator {
+// Polymer properties decorators
+export function set(value: any, options: polymer.PropObjectType = <polymer.PropObjectType>{}): PropertyDecorator {
   return (target, key) => {
     let propValue: any = target[key];
+
     // is it computed value?
     if (typeof propValue === "function") {
       let fName = `__$${key}`;
-      options.computed = fName + (options.computed || propValue.toString()).match(/(\(.+?\))/);
+      options.computed = fName + (options.computed || propValue.toString()).match(/(\(.+?\))/)[1];
       target[fName] = propValue;
     }
+
     setTypeValue(options, value);
     var props = target.properties || (target.properties = {});
     props[key] = options;
-  }
-}
-
-// Polymer properties decorators
-export module prop {
-  function forceType(options: polymer.PropObjectType, type: polymer.PropConstructorType): polymer.PropObjectType {
-    if (!options) {
-      return {type: type}
-    }
-    options.type = type;
-    return options
-  }
-
-  function propertyDecorator(target: TypedPolymer, key: string): any {
-    let options: polymer.PropObjectType = this;
-    let value: any = target[key];
-    // is it computed value?
-    if (typeof value === "function") {
-      let fName = `__$${key}`;
-      options.computed = fName + (options.computed || value.toString()).match(/(\(.+?\))/);
-      target[fName] = value;
-    } else if (value !== undefined) {
-      options.value = value;
-
-      // prevent additional initialization
-      target[key] = undefined;
-    }
-    var props = target.properties || (target.properties = {});
-    props[key] = options;
-  }
-
-  export function boolean(options?: polymer.PropObjectType): PropertyDecorator {
-    return propertyDecorator.bind(forceType(options, Boolean));
-  }
-
-  export function date(options?: polymer.PropObjectType): PropertyDecorator {
-    return propertyDecorator.bind(forceType(options, Date));
-  }
-
-  export function number(options?: polymer.PropObjectType): PropertyDecorator {
-    return propertyDecorator.bind(forceType(options, Number));
-  }
-
-  export function string(options?: polymer.PropObjectType): PropertyDecorator {
-    return propertyDecorator.bind(forceType(options, String));
-  }
-
-  export function array(options?: polymer.PropObjectType): PropertyDecorator {
-    return propertyDecorator.bind(forceType(options, Array));
-  }
-
-  export function object(options?: polymer.PropObjectType): PropertyDecorator {
-    return propertyDecorator.bind(forceType(options, Object));
   }
 }
