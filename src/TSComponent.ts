@@ -1,4 +1,4 @@
-import {templateHooks} from "./templateHooks";
+import {templateHooks} from "./hooks";
 
 export interface TypedPolymer extends polymer.Base {
   template?: string;

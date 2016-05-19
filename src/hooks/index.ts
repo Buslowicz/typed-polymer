@@ -1,4 +1,4 @@
-import * as dynamicFunctions from "./hooks/dynamicFunctions";
+import * as dynamicFunctions from "./dynamicFunctions";
 
 export interface TemplateHook {
   pattern: string;

@@ -4,7 +4,6 @@
   "description": "Nothing in particular",
   "dependencies": {
     "Polymer": "^1.4.0",
-    "polymer-ts": "^0.1.26",
     "webcomponents.js": "^0.7.22"
   },
   "devDependencies": {
