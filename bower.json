@@ -1,0 +1,19 @@
+{
+  "name": "typed-polymer",
+  "description": "Nothing in particular",
+  "authors": [
+    "Draccoz"
+  ],
+  "license": "MIT",
+  "homepage": "",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "polymer": "^1.4.0"
+  }
+}
