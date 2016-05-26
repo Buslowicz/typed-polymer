@@ -18,7 +18,7 @@ interface DomModule extends HTMLElement {
   register: () => void;
 }
 
-function setTemplate(proto: TypedPolymer, module: DomModule): void {
+function setTemplate(proto: TypedPolymer, module: DomModule) {
   if (!(typeof proto.template === "string")) {
     return;
   }
@@ -32,7 +32,7 @@ function setTemplate(proto: TypedPolymer, module: DomModule): void {
   module.appendChild(templateElement);
 }
 
-function setStyles(proto: TypedPolymer, module: DomModule): void {
+function setStyles(proto: TypedPolymer, module: DomModule) {
   if (!Array.isArray(proto.styles)) {
     return;
   }
@@ -56,7 +56,7 @@ function createDomModule() {
 export class TypedPolymer {
   is: string = "typed-polymer";
 
-  public static register(): void {
+  public static register() {
     let proto = this.prototype;
 
     let name = proto.constructor.toString().match(/(?:function )?([a-z_$][\w_$]+)/i);
@@ -77,24 +77,24 @@ export class TypedPolymer {
 
 // TypedPolymer decorators
 export function template(template: string): ClassDecorator {
-  return target => {target.prototype.template = template};
+  return target => { target.prototype.template = template; };
 }
 
 export function styles(styles: string[]): ClassDecorator {
-  return target => {target.prototype.styles = styles};
+  return target => { target.prototype.styles = styles; };
 }
 
 // Polymer Element decorators
 export function extend(baseElement: string): ClassDecorator {
-  return target => {target.prototype.extends = baseElement};
+  return target => { target.prototype.extends = baseElement; };
 }
 
 export function hostAttributes(map: {[name: string]: any}): ClassDecorator {
-  return target => {target.prototype.hostAttributes = map};
+  return target => { target.prototype.hostAttributes = map; };
 }
 
 export function behaviors(behaviors: Object[]): ClassDecorator {
-  return target => {target.prototype.behaviors = behaviors};
+  return target => { target.prototype.behaviors = behaviors; };
 }
 
 function setTypeValue(options: polymer.PropObjectType, value: any) {
@@ -128,7 +128,30 @@ export function set(value: any, options: polymer.PropObjectType = <polymer.PropO
     }
 
     setTypeValue(options, value);
-    var props = target.properties || (target.properties = {});
-    props[key] = options;
-  }
+
+    target.properties = target.properties || {};
+    target.properties[key] = options;
+  };
+}
+
+export function listen(event: string, targetSelector?: string): PropertyDecorator {
+  return (target, key) => {
+    if (targetSelector) {
+      let originalCallback: Function = target[key];
+      target[`__$${key}`] = originalCallback;
+      target[key] = function (...args) {
+        let evt: Event = args[0];
+        let evtTarget: HTMLElement = <HTMLElement>evt.target;
+        // console.log("selector match check", evtTarget);
+        if (evtTarget.matches(targetSelector)) {
+          originalCallback.apply(this, args);
+        }
+      };
+    }
+
+    target.listeners = target.listeners || {};
+    target.listeners[event] = key;
+
+    return target[key];
+  };
 }
