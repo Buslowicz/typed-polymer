@@ -154,7 +154,6 @@ export function on(eventName: string, selector?: string, once: boolean = false):
   if (/[^\.]+\.[^\.]+/.test(eventName)) {
     selector = null;
   }
-  // TODO: make "stopPropagation" function cancel the forEach loop
 
   return !selector ?
     (instance, propName) => {
@@ -167,9 +166,17 @@ export function on(eventName: string, selector?: string, once: boolean = false):
 
       if (!instance.targetListeners[eventName]) {
         instance.targetListeners[eventName] = {};
+
         instance[`__on_${eventName}`] = (evt: Event) => {
           let el: HTMLElement = <HTMLElement>evt.target;
           let listeners: any = instance.targetListeners[eventName];
+
+          evt["_stopImmediatePropagation"] = evt.stopImmediatePropagation;
+
+          evt.stopImmediatePropagation = function() {
+            this._stopImmediatePropagation();
+            this._propagationHalted = true;
+          };
 
           Object
             .keys(listeners)
@@ -179,13 +186,13 @@ export function on(eventName: string, selector?: string, once: boolean = false):
               if (once) {
                 delete listeners[key];
               }
-              return brk === false;
+              return brk === false || evt["_propagationHalted"];
             });
         };
 
         instance.listeners = instance.listeners || {};
         if (instance.listeners[eventName]) {
-          // TODO: handle override warnings
+          // TODO: provide override warnings
           // if (instance.targetListeners[eventName]["*"]) {
           //   console.warn(`Method '${propName}' overrides '${instance.listeners[eventName]}' ` +
           //     `which also listens to '${eventName}'`);
