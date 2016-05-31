@@ -147,16 +147,25 @@ export function set(value: any, options: polymer.PropObjectType = <polymer.PropO
 }
 
 export function listen(eventName: string, selector?: string, once: boolean = false): PropertyDecorator {
-  // TODO: check event string (event or event + id?) and parse it (prune the targetSelector if it contains the id)
+  if (/[^\.]+\.[^\.]+/.test(eventName)) {
+    selector = null;
+  }
   // TODO: handle adding target listener to existing event (with registered callback)
-  return (instance, propName) => {
+  // TODO: implement "once"
+
+  if (!selector) return (instance, propName) => {
+    instance.listeners = instance.listeners || {};
+    instance.listeners[eventName] = propName;
+  };
+
+  else return (instance, propName) => {
     instance.targetListeners = instance.targetListeners || {};
 
     if (!instance.targetListeners[eventName]) {
       instance.targetListeners[eventName] = {};
       instance[`__on_${selector}_${eventName}`] = function (evt: Event) {
-        var el: HTMLElement = <HTMLElement>evt.target;
-        var listeners: any = instance.targetListeners[eventName];
+        let el: HTMLElement = <HTMLElement>evt.target;
+        let listeners: any = instance.targetListeners[eventName];
 
         Object
           .keys(listeners)
