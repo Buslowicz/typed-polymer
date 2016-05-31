@@ -174,11 +174,12 @@ export function on(eventName: string, selector?: string, once: boolean = false):
           Object
             .keys(listeners)
             .filter(s => el.matches(s))
-            .forEach((key) => {
-              instance[listeners[key]](evt);
+            .some((key) => {
+              let brk = instance[listeners[key]](evt);
               if (once) {
                 delete listeners[key];
               }
+              return brk === false;
             });
         };
 
