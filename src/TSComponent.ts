@@ -154,7 +154,6 @@ export function on(eventName: string, selector?: string, once: boolean = false):
   if (/[^\.]+\.[^\.]+/.test(eventName)) {
     selector = null;
   }
-  // TODO: handle adding target listener to existing event (with registered callback)
   // TODO: make "stopPropagation" function cancel the forEach loop
 
   return !selector ?
@@ -184,6 +183,15 @@ export function on(eventName: string, selector?: string, once: boolean = false):
         };
 
         instance.listeners = instance.listeners || {};
+        if (instance.listeners[eventName]) {
+          // TODO: handle override warnings
+          // if (instance.targetListeners[eventName]["*"]) {
+          //   console.warn(`Method '${propName}' overrides '${instance.listeners[eventName]}' ` +
+          //     `which also listens to '${eventName}'`);
+          // }
+
+          instance.targetListeners[eventName]["*"] = instance.listeners[eventName];
+        }
         instance.listeners[eventName] = `__on_${eventName}`;
       }
 
@@ -191,7 +199,7 @@ export function on(eventName: string, selector?: string, once: boolean = false):
       let eventListeners: any = instance.targetListeners[eventName];
 
       if (eventListeners[trimmedSelector]) {
-        console.warn(`Method '${propName}' overrides '${eventListeners[selector]}'` +
+        console.warn(`Method '${propName}' overrides '${eventListeners[selector]}' ` +
           `which also listens to '${eventName}' on '${selector}'`);
       } else {
         eventListeners[trimmedSelector] = propName;
