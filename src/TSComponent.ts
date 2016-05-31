@@ -4,6 +4,8 @@ export interface TypedPolymer extends polymer.Base {
   template?: string;
   styles?: string[];
   constructorName: string;
+
+  targetListeners: {[eventName: string]: {[selector: string]: string}};
 }
 
 interface ClassDecorator {
@@ -77,24 +79,34 @@ export class TypedPolymer {
 
 // TypedPolymer decorators
 export function template(template: string): ClassDecorator {
-  return target => { target.prototype.template = template; };
+  return target => {
+    target.prototype.template = template;
+  };
 }
 
 export function styles(styles: string[]): ClassDecorator {
-  return target => { target.prototype.styles = styles; };
+  return target => {
+    target.prototype.styles = styles;
+  };
 }
 
 // Polymer Element decorators
 export function extend(baseElement: string): ClassDecorator {
-  return target => { target.prototype.extends = baseElement; };
+  return target => {
+    target.prototype.extends = baseElement;
+  };
 }
 
 export function hostAttributes(map: {[name: string]: any}): ClassDecorator {
-  return target => { target.prototype.hostAttributes = map; };
+  return target => {
+    target.prototype.hostAttributes = map;
+  };
 }
 
 export function behaviors(behaviors: Object[]): ClassDecorator {
-  return target => { target.prototype.behaviors = behaviors; };
+  return target => {
+    target.prototype.behaviors = behaviors;
+  };
 }
 
 function setTypeValue(options: polymer.PropObjectType, value: any) {
@@ -134,24 +146,38 @@ export function set(value: any, options: polymer.PropObjectType = <polymer.PropO
   };
 }
 
-export function listen(event: string, targetSelector?: string): PropertyDecorator {
-  return (target, key) => {
-    if (targetSelector) {
-      let originalCallback: Function = target[key];
-      target[`__$${key}`] = originalCallback;
-      target[key] = function (...args) {
-        let evt: Event = args[0];
-        let evtTarget: HTMLElement = <HTMLElement>evt.target;
-        // console.log("selector match check", evtTarget);
-        if (evtTarget.matches(targetSelector)) {
-          originalCallback.apply(this, args);
-        }
+export function listen(eventName: string, selector?: string, once: boolean = false): PropertyDecorator {
+  // TODO: check event string (event or event + id?) and parse it (prune the targetSelector if it contains the id)
+  // TODO: handle adding target listener to existing event (with registered callback)
+  return (instance, propName) => {
+    instance.targetListeners = instance.targetListeners || {};
+
+    if (!instance.targetListeners[eventName]) {
+      instance.targetListeners[eventName] = {};
+      instance[`__on_${selector}_${eventName}`] = function (evt: Event) {
+        var el: HTMLElement = <HTMLElement>evt.target;
+        var listeners: any = instance.targetListeners[eventName];
+
+        Object
+          .keys(listeners)
+          .filter(s => el.matches(s))
+          .forEach((key) => instance[listeners[key]](evt));
       };
+
+      instance.listeners = instance.listeners || {};
+      instance.listeners[eventName] = `__on_${selector}_${eventName}`;
     }
 
-    target.listeners = target.listeners || {};
-    target.listeners[event] = key;
+    let trimmedSelector: string = selector.replace(/ /g, "");
+    let eventListeners: any = instance.targetListeners[eventName];
 
-    return target[key];
+    if (eventListeners[trimmedSelector]) {
+      console.warn(`Method '${propName}' overrides '${eventListeners[selector]}'` +
+        `which also listens to '${eventName}' on '${selector}'`);
+    } else {
+      eventListeners[trimmedSelector] = propName;
+    }
+
+    return instance[propName];
   };
 }
