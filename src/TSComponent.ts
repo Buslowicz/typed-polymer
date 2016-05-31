@@ -146,47 +146,57 @@ export function set(value: any, options: polymer.PropObjectType = <polymer.PropO
   };
 }
 
-export function listen(eventName: string, selector?: string, once: boolean = false): PropertyDecorator {
+export function once(eventName: string, selector: string = "*"): PropertyDecorator {
+  return on(eventName, selector, true);
+}
+
+export function on(eventName: string, selector?: string, once: boolean = false): PropertyDecorator {
   if (/[^\.]+\.[^\.]+/.test(eventName)) {
     selector = null;
   }
   // TODO: handle adding target listener to existing event (with registered callback)
-  // TODO: implement "once"
+  // TODO: make "stopPropagation" function cancel the forEach loop
 
-  if (!selector) return (instance, propName) => {
-    instance.listeners = instance.listeners || {};
-    instance.listeners[eventName] = propName;
-  };
-
-  else return (instance, propName) => {
-    instance.targetListeners = instance.targetListeners || {};
-
-    if (!instance.targetListeners[eventName]) {
-      instance.targetListeners[eventName] = {};
-      instance[`__on_${selector}_${eventName}`] = function (evt: Event) {
-        let el: HTMLElement = <HTMLElement>evt.target;
-        let listeners: any = instance.targetListeners[eventName];
-
-        Object
-          .keys(listeners)
-          .filter(s => el.matches(s))
-          .forEach((key) => instance[listeners[key]](evt));
-      };
-
+  return !selector ?
+    (instance, propName) => {
       instance.listeners = instance.listeners || {};
-      instance.listeners[eventName] = `__on_${selector}_${eventName}`;
+      instance.listeners[eventName] = propName;
     }
+    :
+    (instance, propName) => {
+      instance.targetListeners = instance.targetListeners || {};
 
-    let trimmedSelector: string = selector.replace(/ /g, "");
-    let eventListeners: any = instance.targetListeners[eventName];
+      if (!instance.targetListeners[eventName]) {
+        instance.targetListeners[eventName] = {};
+        instance[`__on_${eventName}`] = (evt: Event) => {
+          let el: HTMLElement = <HTMLElement>evt.target;
+          let listeners: any = instance.targetListeners[eventName];
 
-    if (eventListeners[trimmedSelector]) {
-      console.warn(`Method '${propName}' overrides '${eventListeners[selector]}'` +
-        `which also listens to '${eventName}' on '${selector}'`);
-    } else {
-      eventListeners[trimmedSelector] = propName;
-    }
+          Object
+            .keys(listeners)
+            .filter(s => el.matches(s))
+            .forEach((key) => {
+              instance[listeners[key]](evt);
+              if (once) {
+                delete listeners[key];
+              }
+            });
+        };
 
-    return instance[propName];
-  };
+        instance.listeners = instance.listeners || {};
+        instance.listeners[eventName] = `__on_${eventName}`;
+      }
+
+      let trimmedSelector: string = selector.replace(/ /g, "");
+      let eventListeners: any = instance.targetListeners[eventName];
+
+      if (eventListeners[trimmedSelector]) {
+        console.warn(`Method '${propName}' overrides '${eventListeners[selector]}'` +
+          `which also listens to '${eventName}' on '${selector}'`);
+      } else {
+        eventListeners[trimmedSelector] = propName;
+      }
+
+      return instance[propName];
+    };
 }
