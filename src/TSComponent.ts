@@ -9,11 +9,11 @@ export interface TypedPolymer extends polymer.Base {
 }
 
 interface ClassDecorator {
-  (target: {prototype: TypedPolymer}): any;
+  (instance: {prototype: TypedPolymer}): any;
 }
 
 interface PropertyDecorator {
-  (target: TypedPolymer, key: string): any;
+  (instance: TypedPolymer, propName: string): any;
 }
 
 interface DomModule extends HTMLElement {
@@ -129,20 +129,20 @@ function setTypeValue(options: polymer.PropObjectType, value: any) {
 
 // Polymer properties decorators
 export function set(value: any, options: polymer.PropObjectType = <polymer.PropObjectType>{}): PropertyDecorator {
-  return (target, key) => {
-    let propValue: any = target[key];
+  return (instance, propName) => {
+    let propValue: any = instance[propName];
 
     // is it computed value?
     if (typeof propValue === "function") {
-      let fName = `__$${key}`;
+      let fName = `__$${propName}`;
       options.computed = fName + (options.computed || propValue.toString()).match(/(\(.+?\))/)[1];
-      target[fName] = propValue;
+      instance[fName] = propValue;
     }
 
     setTypeValue(options, value);
 
-    target.properties = target.properties || {};
-    target.properties[key] = options;
+    instance.properties = instance.properties || {};
+    instance.properties[propName] = options;
   };
 }
 
@@ -173,7 +173,7 @@ export function on(eventName: string, selector?: string, once: boolean = false):
 
           evt["_stopImmediatePropagation"] = evt.stopImmediatePropagation;
 
-          evt.stopImmediatePropagation = function() {
+          evt.stopImmediatePropagation = function () {
             this._stopImmediatePropagation();
             this._propagationHalted = true;
           };
@@ -214,5 +214,21 @@ export function on(eventName: string, selector?: string, once: boolean = false):
       }
 
       return instance[propName];
+    };
+}
+
+export function observe(observed: string): PropertyDecorator {
+  return ~observed.indexOf(",") || ~observed.indexOf(".") ?
+    // observing multiple properties or path
+    (instance, propName) => {
+      instance.observers = instance.observers || [];
+      instance.observers.push(propName + "(" + observed + ")");
+    }
+    :
+    // observing single property
+    (instance, propName) => {
+      instance.properties = instance.properties || {};
+      instance.properties[observed] = instance.properties[observed] || <ObjectConstructor>{};
+      (<polymer.PropObjectType>instance.properties[observed]).observer = propName;
     };
 }
