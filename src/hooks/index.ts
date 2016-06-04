@@ -1,4 +1,4 @@
-import * as dynamicFunctions from "./dynamicFunctions";
+import * as expressionBinding from "./expressionBinding";
 
 export interface TemplateHook {
   pattern: string;
@@ -6,5 +6,5 @@ export interface TemplateHook {
 }
 
 export var templateHooks: TemplateHook[] = [
-  dynamicFunctions
+  expressionBinding
 ];

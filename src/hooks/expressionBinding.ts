@@ -11,12 +11,13 @@ function generateFunctionName(name: string): string {
 }
 
 export var pattern = "\{\{\{(.*)}}}";
-export var callback = function dynamicFunctions(match: string, p: string): string {
+export var callback = function expressionBinding(match: string, p: string): string {
   var f: any, args = [null], t = <TypedPolymer>this;
+  // TODO: improve cache to omit below regexp
   var attrs = p
     .replace(/'[^']+'/, "") // remove single quoted strings
     .replace(/"[^"]+"/, "") // remove double quoted strings
-    .match(/([a-z_$\.][\w_$]*)/ig);  // get all words starting from a letter, _, $ or a dot
+    .match(/([a-z_$][\w_$]*)/ig);  // get all words starting from a letter, _ or $
 
   if (!(f = CACHE[p])) {
     Object.getOwnPropertyNames(t.properties || {}).forEach(property => ~attrs.indexOf(property) && args.push(property));
@@ -25,5 +26,5 @@ export var callback = function dynamicFunctions(match: string, p: string): strin
 
   var functionName = generateFunctionName(t.constructorName);
   t[functionName] = f;
-  return `[[${functionName}(${attrs.join(",")})]]`;
+  return `[[${functionName}(${args.slice(1).join(",")})]]`;
 };
