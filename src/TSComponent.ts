@@ -103,9 +103,14 @@ export function hostAttributes(map: {[name: string]: any}): ClassDecorator {
   };
 }
 
-export function behaviors(behaviors: Object[]): ClassDecorator {
+export function behavior(behavior: Function|Object): ClassDecorator {
+  if (!behavior) {
+    throw new ReferenceError("Behavior decorator has to be given a behavior (Function/Class or Object)");
+  }
   return target => {
-    target.prototype.behaviors = behaviors;
+    let prototype: TypedPolymer = target.prototype;
+    prototype.behaviors = prototype.behaviors || [];
+    prototype.behaviors.push((<Function>behavior).prototype || behavior);
   };
 }
 
@@ -213,6 +218,7 @@ export function on(eventName: string, selector?: string, once: boolean = false):
         eventListeners[trimmedSelector] = propName;
       }
 
+      // TODO: is it necessary?
       return instance[propName];
     };
 }
