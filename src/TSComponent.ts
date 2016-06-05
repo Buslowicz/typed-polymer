@@ -58,16 +58,19 @@ function createDomModule() {
 export class TypedPolymer {
   is: string = "typed-polymer";
 
-  public static register() {
+  public static register(name?: string) {
     let proto = this.prototype;
 
-    let name = proto.constructor.toString().match(/(?:function )?([a-z_$][\w_$]+)/i);
-    if (!name || name[0] === name[1]) {
-      throw new TypeError("Class has no name");
+    if (!name) {
+      let className = proto.constructor.toString().match(/(?:function )?([a-z_$][\w_$]+)/i);
+      if (!className || className[0] === className[1]) {
+        throw new TypeError("Class has no name");
+      }
+      name = className[1];
     }
 
-    proto.constructorName = name[1];
-    proto.is = name[1].replace(/([A-Z])/g, (_, char, i) => `${i ? "-" : ""}${char.toLowerCase()}`);
+    proto.constructorName = name;
+    proto.is = name.replace(/([A-Z])/g, (_, char, i) => `${i ? "-" : ""}${char.toLowerCase()}`);
 
     if (proto.template || proto.styles) {
       createDomModule.call(this);
@@ -117,15 +120,15 @@ export function behavior(behavior: Function|Object): ClassDecorator {
 function setTypeValue(options: polymer.PropObjectType, value: any) {
   let types: Function[] = [String, Boolean, Number, Date, Array];
   if (!value) {
-    return options.value = null;
+    return;
   }
   if (~types.indexOf(value)) {
-    options.type = value;
+    options.type = options.type || value;
   } else if (~types.indexOf(value.constructor)) {
-    options.type = value.constructor;
+    options.type = options.type || value.constructor;
     options.value = value;
   } else {
-    options.type = Object;
+    options.type = options.type || Object;
     if (value !== Object) {
       options.value = value;
     }
