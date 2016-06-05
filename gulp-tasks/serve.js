@@ -3,30 +3,11 @@ var browserSync = require("browser-sync").create();
 
 var BUILD_DIR = "dist";
 
-gulp.task("serve:demo", function () {
-  browserSync.init({
-    server: {
-      baseDir: [BUILD_DIR, "bower_components", "./"],
-      index: "demo.html"
-    }
-  });
-});
+function testWatch() {
+  gulp.watch("test/**/*.ts", ["build:test"]);
 
-gulp.task("serve:test", function () {
-  browserSync.init({
-    server: {
-      baseDir: [BUILD_DIR, "bower_components", "./", "test"]
-    }
-  });
-});
-
-gulp.task("serve:docs", function () {
-  browserSync.init({
-    server: {
-      baseDir: ["docs"]
-    }
-  });
-});
+  gulp.watch(["test/**/*.js", "test/**/*.html"], browserSync.reload);
+}
 
 function devWatch() {
   gulp.watch("src/**/*.scss", ["sass:dev"]);
@@ -41,6 +22,25 @@ function devWatch() {
     "**/*.html"
   ], ["copy:assets", browserSync.reload]);
 }
+
+gulp.task("serve:demo", function () {
+  browserSync.init({
+    server: {
+      baseDir: [BUILD_DIR, "bower_components", "./"],
+      index: "demo.html"
+    }
+  });
+});
+
+gulp.task("dev:test", ["build:test"], function () {
+  browserSync.init({
+    server: {
+      baseDir: [BUILD_DIR, "bower_components", "./", "test"]
+    }
+  });
+
+  testWatch();
+});
 
 gulp.task("watch", ["build:dev"], devWatch);
 

@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <link href="https://cdn.rawgit.com/mochajs/mocha/2.2.5/mocha.css" rel="stylesheet" />
+</head>
+<body>
+
+<div id="mocha"></div>
+
+<script src="../bower_components/webcomponentsjs/webcomponents-lite.min.js"></script>
+<link rel="import" href="../bower_components/polymer/polymer.html">
+
+<script src="../node_modules/mocha/mocha.js"></script>
+<script src="../node_modules/chai/chai.js"></script>
+
+<script>mocha.setup('bdd')</script>
+<script src="tests.js"></script>
+<script>
+  mocha.checkLeaks();
+  mocha.globals(['Polymer']);
+  mocha.run();
+</script>
+</body>
+</html>
