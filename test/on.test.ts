@@ -89,7 +89,6 @@ function testSuite(target: string, ...methods: string[]): () => void {
     allNodes.forEach(node => node.dispatchEvent(new CustomEvent(eventName, {bubbles: true})));
     methods.forEach(method => {
       let [methodName, expected = elementDom.querySelectorAll(selector).length + ""] = method.split(":");
-      console.log(selector, eventName, methodName, expected, element[methodName]["n"], allNodes);
       element[methodName]["n"].should.equal(parseInt(expected));
     });
   }
