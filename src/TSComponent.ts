@@ -166,7 +166,11 @@ export function on(eventName: string, selector?: string, once: boolean = false):
   return !selector ?
     (instance, propName) => {
       instance.listeners = instance.listeners || {};
-      instance.listeners[eventName] = propName;
+      if (instance.listeners[eventName]) {
+        on(eventName, "*", once)(instance, propName);
+      } else {
+        instance.listeners[eventName] = propName;
+      }
     }
     :
     (instance, propName) => {
@@ -220,9 +224,6 @@ export function on(eventName: string, selector?: string, once: boolean = false):
       } else {
         eventListeners[trimmedSelector] = propName;
       }
-
-      // TODO: is it necessary?
-      return instance[propName];
     };
 }
 
