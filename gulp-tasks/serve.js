@@ -4,6 +4,8 @@ var browserSync = require("browser-sync").create();
 var BUILD_DIR = "dist";
 
 function testWatch() {
+  devWatch();
+
   gulp.watch("test/**/*.ts", ["build:test"]);
 
   gulp.watch(["test/**/*.js", "test/**/*.html"], browserSync.reload);
@@ -11,7 +13,7 @@ function testWatch() {
 
 function devWatch() {
   gulp.watch("src/**/*.scss", ["sass:dev"]);
-  gulp.watch("src/**/*.ts", ["webpack"]);
+  gulp.watch("src/**/*.ts", ["webpack:src"]);
 
   gulp.watch([
     BUILD_DIR + "/**/*.js",
