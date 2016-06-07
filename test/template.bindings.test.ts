@@ -1,4 +1,5 @@
 import {TypedPolymer, set, template} from "../src/TSComponent";
+import DomApi = polymer.DomApi;
 
 chai.should();
 const expect = chai.expect;
@@ -23,12 +24,12 @@ class TestComponentTemplate extends TypedPolymer {
 TestComponentTemplate.register();
 
 const element: TestComponentTemplate = <any>document.createElement("test-component-template");
+const elementDom: DomApi = Polymer.dom(element["root"]);
 
 describe("Decorator@template", function() {
   it("should contain the `H1` tag", function() {
-    var element: HTMLElement = document.createElement("test-component-template");
     //noinspection BadExpressionStatementJS
-    expect(element.querySelector("h1")).to.not.be.null;
+    expect(elementDom.querySelector("h1")).to.not.be.null;
   });
 
   describe("expression binding", function() {
