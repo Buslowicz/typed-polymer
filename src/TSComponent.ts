@@ -163,68 +163,70 @@ export function on(eventName: string, selector?: string, once: boolean = false):
     selector = null;
   }
 
-  return !selector ?
-    (instance, propName) => {
-      instance.listeners = instance.listeners || {};
-      if (instance.listeners[eventName]) {
-        on(eventName, "*", once)(instance, propName);
-      } else {
-        instance.listeners[eventName] = propName;
-      }
+  function basicEvent(instance, propName) {
+    instance.listeners = instance.listeners || {};
+    if (instance.listeners[eventName]) {
+      selector = "*";
+      targetedEvent(instance, propName);
+    } else {
+      instance.listeners[eventName] = propName;
     }
-    :
-    (instance, propName) => {
-      instance.targetListeners = instance.targetListeners || {};
+  }
 
-      if (!instance.targetListeners[eventName]) {
-        instance.targetListeners[eventName] = {};
+  function targetedEvent(instance, propName) {
+    instance.targetListeners = instance.targetListeners || {};
 
-        instance[`__on_${eventName}`] = (evt: Event) => {
-          let el: HTMLElement = <HTMLElement>evt.target;
-          let listeners: any = instance.targetListeners[eventName];
+    if (!instance.targetListeners[eventName]) {
+      instance.targetListeners[eventName] = {};
 
-          evt["_stopImmediatePropagation"] = evt.stopImmediatePropagation;
+      instance[`__on_${eventName}`] = (evt: Event) => {
+        let el: HTMLElement = <HTMLElement>evt.target;
+        let listeners: any = instance.targetListeners[eventName];
 
-          evt.stopImmediatePropagation = function () {
-            this._stopImmediatePropagation();
-            this._propagationHalted = true;
-          };
+        evt["_stopImmediatePropagation"] = evt.stopImmediatePropagation;
 
-          Object
-            .keys(listeners)
-            .filter(s => el.matches(s))
-            .some((key) => {
-              let brk = instance[listeners[key]](evt);
-              if (once) {
-                delete listeners[key];
-              }
-              return brk === false || evt["_propagationHalted"];
-            });
+        evt.stopImmediatePropagation = function () {
+          this._stopImmediatePropagation();
+          this._propagationHalted = true;
         };
 
-        instance.listeners = instance.listeners || {};
-        if (instance.listeners[eventName]) {
-          // TODO: provide override warnings
-          // if (instance.targetListeners[eventName]["*"]) {
-          //   console.warn(`Method '${propName}' overrides '${instance.listeners[eventName]}' ` +
-          //     `which also listens to '${eventName}'`);
-          // }
+        Object
+          .keys(listeners)
+          .filter(s => el.matches(s))
+          .some((key) => {
+            let brk = instance[listeners[key]](evt);
+            if (once) {
+              delete listeners[key];
+            }
+            return brk === false || evt["_propagationHalted"];
+          });
+      };
 
-          instance.targetListeners[eventName]["*"] = instance.listeners[eventName];
-        }
-        instance.listeners[eventName] = `__on_${eventName}`;
+      instance.listeners = instance.listeners || {};
+      if (instance.listeners[eventName]) {
+        // TODO: provide override warnings
+        // if (instance.targetListeners[eventName]["*"]) {
+        //   console.warn(`Method '${propName}' overrides '${instance.listeners[eventName]}' ` +
+        //     `which also listens to '${eventName}'`);
+        // }
+
+        instance.targetListeners[eventName]["*"] = instance.listeners[eventName];
       }
+      instance.listeners[eventName] = `__on_${eventName}`;
+    }
 
-      let trimmedSelector: string = selector.replace(/ /g, "");
-      let eventListeners: any = instance.targetListeners[eventName];
+    let trimmedSelector: string = selector.replace(/ /g, "");
+    let eventListeners: any = instance.targetListeners[eventName];
 
-      if (eventListeners[trimmedSelector]) {
-        console.warn(`Method '${propName}' overrides '${eventListeners[selector]}' ` +
-          `which also listens to '${eventName}' on '${selector}'`);
-      } else {
-        eventListeners[trimmedSelector] = propName;
-      }
-    };
+    if (eventListeners[trimmedSelector]) {
+      console.warn(`Method '${propName}' overrides '${eventListeners[selector]}' ` +
+        `which also listens to '${eventName}' on '${selector}'`);
+    } else {
+      eventListeners[trimmedSelector] = propName;
+    }
+  }
+
+  return !selector ? basicEvent : targetedEvent;
 }
 
 export function observe(observed: string): PropertyDecorator {
