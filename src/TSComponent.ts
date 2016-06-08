@@ -154,8 +154,16 @@ export function set(value: any, options: polymer.PropObjectType = <polymer.PropO
   };
 }
 
-export function once(eventName: string, selector: string = "*"): PropertyDecorator {
-  return on(eventName, selector, true);
+export function once(eventName: string): PropertyDecorator {
+  return (instance, propName) => {
+    instance.listeners = instance.listeners || {};
+    instance[`__once_${propName}`] = function (...args) {
+      let [target, event]: string[] = eventName.split(".");
+      this[propName].apply(this, args);
+      this.unlisten(event ? this.$[target] : this, event || eventName, `__once_${propName}`);
+    };
+    instance.listeners[eventName] = `__once_${propName}`;
+  }
 }
 
 export function on(eventName: string, selector?: string, once: boolean = false): PropertyDecorator {
