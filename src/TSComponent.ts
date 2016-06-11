@@ -195,6 +195,8 @@ export function once(eventName: string): PropertyDecorator {
 }
 
 export function on(eventName: string, selector: string = "*"): PropertyDecorator {
+  // We don't use the Polymer native `listeners`. This is due to problems with different event callbacks order,
+  // depending on whether using shady dom, or a shadow dom
   if (/[^\.]+\.[^\.]+/.test(eventName)) {
     let eventData: string[] = eventName.split(".");
     selector = `#${eventData[0]}`;
