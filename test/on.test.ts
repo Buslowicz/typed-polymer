@@ -64,16 +64,6 @@ class TestComponentOn extends TypedPolymer {
   selector7(): void {
     this.selector7["n"]++;
   }
-
-  @on("test2", "h1")
-  selector8(): void {
-    this.selector8["n"]++;
-  }
-
-  @on("test2")
-  selector9(): void {
-    this.selector9["n"]++;
-  }
 }
 
 TestComponentOn.register();
@@ -102,5 +92,4 @@ describe("Decorator@on", function () {
   it("should fire all selector listeners matching same element", testSuite("button", "selector2", "selector3"));
   it("should NOT trigger further callbacks if false is returned", testSuite(".test1", "selector4", "selector5:0"));
   it("should NOT trigger further callbacks if `stopImmediatePropagation` is called", testSuite(".test3", "selector6", "selector7:0"));
-  it("should prevent basic event from overriding targeted events", testSuite("*;test2", "selector8:1", "selector9"));
 });

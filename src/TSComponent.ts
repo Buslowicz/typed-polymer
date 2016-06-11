@@ -1,11 +1,12 @@
 import {templateHooks} from "./hooks";
+import Base = polymer.Base;
 
 export interface TypedPolymer extends polymer.Base {
   template?: string;
   styles?: string[];
   constructorName: string;
 
-  targetListeners: {[eventName: string]: {[selector: string]: string}};
+  tpListeners: {[eventName: string]: {[selector: string]: string}};
 }
 
 interface ClassDecorator {
@@ -55,6 +56,16 @@ function createDomModule() {
   module.register();
 }
 
+function ifMatches(selector: string, callback: EventListener): EventListener {
+  return <EventListener>function (ev, detail) {
+    if ((<HTMLElement>ev.target).matches(selector)) {
+      if (callback.call(this.host || this, ev, detail) === false) {
+        ev.stopImmediatePropagation();
+      }
+    }
+  }
+}
+
 export class TypedPolymer {
   is: string = "typed-polymer";
 
@@ -74,6 +85,23 @@ export class TypedPolymer {
 
     if (proto.template || proto.styles) {
       createDomModule.call(this);
+    }
+    if (proto.tpListeners) {
+      proto.ready = function () {
+        Object
+          .keys(proto.tpListeners)
+          .forEach(eventName =>
+            Object
+              .keys(proto.tpListeners[eventName])
+              .forEach(selector => {
+                (Polymer.Settings.useShadow ? this["root"] : this)
+                  .addEventListener(
+                    eventName,
+                    ifMatches(selector, this[proto.tpListeners[eventName][selector]])
+                  )
+              })
+          );
+      };
     }
 
     Polymer(proto);
@@ -166,75 +194,20 @@ export function once(eventName: string): PropertyDecorator {
   }
 }
 
-export function on(eventName: string, selector?: string, once: boolean = false): PropertyDecorator {
+export function on(eventName: string, selector: string = "*"): PropertyDecorator {
   if (/[^\.]+\.[^\.]+/.test(eventName)) {
-    selector = null;
+    let eventData: string[] = eventName.split(".");
+    selector = `#${eventData[0]}`;
+    eventName = eventData[1];
   }
-
-  function basicEvent(instance, propName) {
-    instance.listeners = instance.listeners || {};
-    if (instance.listeners[eventName]) {
-      selector = "*";
-      targetedEvent(instance, propName);
-    } else {
-      instance.listeners[eventName] = propName;
+  return (instance, propName) => {
+    instance.tpListeners = instance.tpListeners || {};
+    instance.tpListeners[eventName] = instance.tpListeners[eventName] || {};
+    if (instance.tpListeners[eventName][selector]) {
+      console.warn(`${propName} overrides ${instance.tpListeners[eventName][selector]}`);
     }
-  }
-
-  function targetedEvent(instance, propName) {
-    instance.targetListeners = instance.targetListeners || {};
-
-    if (!instance.targetListeners[eventName]) {
-      instance.targetListeners[eventName] = {};
-
-      instance[`__on_${eventName}`] = (evt: Event) => {
-        let el: HTMLElement = <HTMLElement>evt.target;
-        let listeners: any = instance.targetListeners[eventName];
-
-        evt["_stopImmediatePropagation"] = evt.stopImmediatePropagation;
-
-        evt.stopImmediatePropagation = function () {
-          this._stopImmediatePropagation();
-          this._propagationHalted = true;
-        };
-
-        Object
-          .keys(listeners)
-          .filter(s => el.matches(s))
-          .some((key) => {
-            let brk = instance[listeners[key]](evt);
-            if (once) {
-              delete listeners[key];
-            }
-            return brk === false || evt["_propagationHalted"];
-          });
-      };
-
-      instance.listeners = instance.listeners || {};
-      if (instance.listeners[eventName]) {
-        // TODO: provide override warnings
-        // if (instance.targetListeners[eventName]["*"]) {
-        //   console.warn(`Method '${propName}' overrides '${instance.listeners[eventName]}' ` +
-        //     `which also listens to '${eventName}'`);
-        // }
-
-        instance.targetListeners[eventName]["*"] = instance.listeners[eventName];
-      }
-      instance.listeners[eventName] = `__on_${eventName}`;
-    }
-
-    let trimmedSelector: string = selector.replace(/ /g, "");
-    let eventListeners: any = instance.targetListeners[eventName];
-
-    if (eventListeners[trimmedSelector]) {
-      console.warn(`Method '${propName}' overrides '${eventListeners[selector]}' ` +
-        `which also listens to '${eventName}' on '${selector}'`);
-    } else {
-      eventListeners[trimmedSelector] = propName;
-    }
-  }
-
-  return !selector ? basicEvent : targetedEvent;
+    instance.tpListeners[eventName][selector] = propName;
+  };
 }
 
 export function observe(observed: string): PropertyDecorator {
