@@ -1,4 +1,5 @@
 import {templateHooks} from "./hooks";
+import PropConstructorType = polymer.PropConstructorType;
 
 export interface TypedPolymer extends polymer.Base {
   template?: string;
@@ -156,28 +157,34 @@ export function behavior(behavior: Function|Object): ClassDecorator {
   };
 }
 
-function setTypeValue(options: polymer.PropObjectType, value: any) {
-  // TODO: handle non-primitive values (not to be shared across multiple instances)
-  // TODO: add option for the value to be shared
+function setTypeValue(options: polymer.PropObjectType, value: any, forceType: polymer.PropConstructorType) {
   let types: Function[] = [String, Boolean, Number, Date, Array];
-  if (!value) {
-    return;
-  }
+
   if (~types.indexOf(value)) {
-    options.type = options.type || value;
-  } else if (~types.indexOf(value.constructor)) {
-    options.type = options.type || value.constructor;
+    // Passing the constructor (excluding Object and Function) will only set the type, and leave a value as undefined
+    options.type = value;
+  } else if (value && ~types.indexOf(value.constructor)) {
+    // Passing a value, which constructor is of the supported type
+    options.type = value.constructor;
     options.value = value;
   } else {
-    options.type = options.type || Object;
+    // If the value is an Object or a Function, set the type to Object
+    options.type = Object;
     if (value !== Object) {
+      // if value is not an Object constructor, assign it as a default
       options.value = value;
     }
+  }
+
+  // Override the type if needed
+  if (forceType) {
+    options.type = forceType;
   }
 }
 
 // Polymer properties decorators
-export function set(value: any, options: polymer.PropObjectType = <polymer.PropObjectType>{}): PropertyDecorator {
+export function set(value: any, forceType?: polymer.PropConstructorType): PropertyDecorator {
+  let options: polymer.PropObjectType = <polymer.PropObjectType>{};
   return (instance, propName) => {
     let propValue: any = instance[propName];
 
@@ -188,7 +195,7 @@ export function set(value: any, options: polymer.PropObjectType = <polymer.PropO
       instance[fName] = propValue;
     }
 
-    setTypeValue(options, value);
+    setTypeValue(options, value, forceType);
 
     instance.properties = instance.properties || {};
     let opts: polymer.PropObjectType = <polymer.PropObjectType>instance.properties[propName];

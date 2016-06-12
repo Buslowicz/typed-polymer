@@ -6,7 +6,7 @@ class TestComponentSet extends TypedPolymer {
   @set(true) booleanValue: boolean;
   @set(50) numberValue: number;
   @set("string") stringValue: string;
-  @set(() => true, {type: Boolean}) functionValue: any;
+  @set(() => true, Boolean) functionValue: any;
   @set({}) objectValue: any;
   @set([]) arrayValue: any[];
 
@@ -15,15 +15,6 @@ class TestComponentSet extends TypedPolymer {
   @set(String) stringType: string;
   @set(Object) objectType: any;
   @set(Array) arrayType: any[];
-
-  @set(null, {
-    type: String,
-    value: null,
-    reflectToAttribute: true,
-    readOnly: true,
-    notify: true
-  })
-  passingOptions: string;
 }
 
 TestComponentSet.register();
@@ -63,16 +54,5 @@ describe("Decorator@set", function () {
     properties.objectType.type.should.equal(Object);
 
     properties.arrayType.type.should.equal(Array);
-  });
-
-  it("should set options to the field", function () {
-    properties.passingOptions.should.deep.equal({
-      type: String,
-      value: null,
-      reflectToAttribute: true,
-      readOnly: true,
-      notify: true,
-      defined: true
-    });
   });
 });
