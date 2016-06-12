@@ -5,3 +5,4 @@ import "./observe.test";
 import "./on.test";
 import "./once.test";
 import "./property-options.test";
+import "./style.test";
