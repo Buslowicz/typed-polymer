@@ -190,12 +190,24 @@ export function set(value: any, forceType?: polymer.PropConstructorType): Proper
 
     // is it computed value?
     if (typeof propValue === "function") {
-      let fName = `__$${propName}`;
-      options.computed = fName + (options.computed || propValue.toString()).match(/(\(.+?\))/)[1];
-      instance[fName] = propValue;
-    }
+      let fName: string = `__$${propName}`;
+      if (typeof value === "string" && typeof forceType === "function") {
+        options.computed = `${fName}(${value})`;
+        options.type = forceType;
+      } else if (typeof value === "function") {
+        options.type = <PropConstructorType>value;
+      } else {
+        throw new SyntaxError("`@set` for a computed property (method) needs a type");
+      }
 
-    setTypeValue(options, value, forceType);
+      if (!options.computed) {
+        options.computed = fName + propValue.toString().match(/(\(.+?\))/)[1];
+      }
+
+      instance[fName] = propValue;
+    } else {
+      setTypeValue(options, value, forceType);
+    }
 
     instance.properties = instance.properties || {};
     let opts: polymer.PropObjectType = <polymer.PropObjectType>instance.properties[propName];
@@ -212,15 +224,15 @@ function setOption(instance, propName, option): void {
   instance.properties[propName][option] = true;
 }
 
-export function reflectToAttribute (instance, propName) {
+export function reflectToAttribute(instance, propName) {
   setOption(instance, propName, "reflectToAttribute");
 }
 
-export function readOnly (instance, propName) {
+export function readOnly(instance, propName) {
   setOption(instance, propName, "readOnly");
 }
 
-export function notify (instance, propName) {
+export function notify(instance, propName) {
   setOption(instance, propName, "notify");
 }
 

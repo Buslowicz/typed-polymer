@@ -15,6 +15,17 @@ class TestComponentSet extends TypedPolymer {
   @set(String) stringType: string;
   @set(Object) objectType: any;
   @set(Array) arrayType: any[];
+  
+  @set(1) n1: number;
+  @set(2) n2: number;
+  @set(Number) computed1(n1: number, n2: number): number {
+    return n1 + n2;
+  }
+
+  @set(() => ({a: 1, b: 2})) o1: any;
+  @set("o1.a, o1.b", Number) computed2(a: number, b: number): number {
+    return a + b;
+  }
 }
 
 TestComponentSet.register();
@@ -54,5 +65,21 @@ describe("Decorator@set", function () {
     properties.objectType.type.should.equal(Object);
 
     properties.arrayType.type.should.equal(Array);
+  });
+
+  it("should create a computed property taking arguments from the method", function () {
+    element.computed1.should.equal(3);
+    element.n1 = 10;
+    element.n2 = 15;
+    element.computed1.should.equal(25);
+  });
+
+  it("should create a computed property with provided properties/paths to observe", function () {
+    element.computed2.should.equal(3);
+    element.set("o1.a", 10);
+    element.set("o1.b", 15);
+    element.computed2.should.equal(25);
+    element.o1 = {a: 5, b: 10};
+    element.computed2.should.equal(15);
   });
 });

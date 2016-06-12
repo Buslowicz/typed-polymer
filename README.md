@@ -38,6 +38,7 @@ Besides of default Polymer features, Typed Polymer introduces:
 * @notify - set `notify` to false
 
 ### Method decorator
+* @set(observed: string, type: polymer.PropConstructorType) - create a computed property (observed properties may be omitted, will then be taken from method arguments)
 * @once(eventName: string) - triggers a decorated function when the provided event is received and removes the listener
 * @on(eventName: string, selector: string = "*") - add an event listener with optional selector filter
 * @observe(observed: string) - observe a property/properties or a path/paths and run decorated function once they change

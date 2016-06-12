@@ -13,10 +13,10 @@ const element: TestComponentStyles = <any>document.createElement("test-component
 
 describe("Decorator@styles", function () {
   beforeEach(function () {
-    document.body.appendChild(<Node>element);
+    document.body.appendChild(<any>element);
   });
   it("should apply styles to component instance", function () {
-    getComputedStyle(<HTMLElement>element).display.should.equal("none");
+    getComputedStyle(<any>element).display.should.equal("none");
     getComputedStyle(element.$.h1).display.should.equal("flex");
   });
 });
