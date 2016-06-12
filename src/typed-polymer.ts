@@ -191,8 +191,30 @@ export function set(value: any, options: polymer.PropObjectType = <polymer.PropO
     setTypeValue(options, value);
 
     instance.properties = instance.properties || {};
+    let opts: polymer.PropObjectType = <polymer.PropObjectType>instance.properties[propName];
+    if (typeof opts === "object") {
+      Object.keys(opts).forEach(opt => options[opt] = opts[opt]);
+    }
     instance.properties[propName] = options;
   };
+}
+
+function setOption(instance, propName, option): void {
+  instance.properties = instance.properties || {};
+  instance.properties[propName] = instance.properties[propName] || {};
+  instance.properties[propName][option] = true;
+}
+
+export function reflectToAttribute (instance, propName) {
+  setOption(instance, propName, "reflectToAttribute");
+}
+
+export function readOnly (instance, propName) {
+  setOption(instance, propName, "readOnly");
+}
+
+export function notify (instance, propName) {
+  setOption(instance, propName, "notify");
 }
 
 export function once(eventName: string): PropertyDecorator {
