@@ -121,6 +121,7 @@ export function template(template: string): ClassDecorator {
 }
 
 export function styles(styles: string[]): ClassDecorator {
+  // TODO: handle shared styles
   return target => {
     target.prototype.styles = styles;
   };

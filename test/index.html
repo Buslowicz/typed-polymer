@@ -5,7 +5,15 @@
   <link href="https://cdn.rawgit.com/mochajs/mocha/2.2.5/mocha.css" rel="stylesheet" />
 </head>
 <body>
-
+<script>
+  var params = {};
+  location.search.slice(1).replace(/([\w]+)=([\w]+)/g, function (q, key, value) {params[key] = value});
+  if (params.dom === "shadow") {
+    document.write("<h1>Shadow Dom</h1>");
+  } else {
+    document.write("<h1>Shady Dom</h1>");
+  }
+</script>
 <div id="mocha"></div>
 
 <script src="../bower_components/webcomponentsjs/webcomponents-lite.min.js"></script>
