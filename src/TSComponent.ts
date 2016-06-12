@@ -1,5 +1,4 @@
 import {templateHooks} from "./hooks";
-import Base = polymer.Base;
 
 export interface TypedPolymer extends polymer.Base {
   template?: string;
@@ -48,7 +47,7 @@ function setStyles(proto: TypedPolymer, module: DomModule) {
 
 function createDomModule() {
   let module: DomModule = <DomModule>document.createElement("dom-module");
-  let proto = this.prototype;
+  let proto: TypedPolymer = this.prototype;
 
   module.id = proto.is;
   setStyles(proto, module);
@@ -58,19 +57,44 @@ function createDomModule() {
 
 function ifMatches(selector: string, callback: EventListener): EventListener {
   return <EventListener>function (ev, detail) {
-    if ((<HTMLElement>ev.target).matches(selector)) {
-      if (callback.call(this.host || this, ev, detail) === false) {
-        ev.stopImmediatePropagation();
-      }
+    if (!(<HTMLElement>ev.target).matches(selector)) {
+      return;
     }
-  }
+    if (callback.call(this.host || this, ev, detail) === false) {
+      ev.stopImmediatePropagation();
+    }
+  };
+}
+
+function initializeListeners(): void {
+  let proto: TypedPolymer = this.prototype;
+  var ready: Function = proto.ready;
+
+  proto.ready = function () {
+    Object
+      .keys(proto.tpListeners)
+      .forEach(eventName =>
+        Object
+          .keys(proto.tpListeners[eventName])
+          .forEach(selector => {
+            (Polymer.Settings.useShadow ? this.root : this)
+              .addEventListener(
+                eventName,
+                ifMatches(selector, this[proto.tpListeners[eventName][selector]])
+              );
+          })
+      );
+    if (ready) {
+      ready.call(this);
+    }
+  };
 }
 
 export class TypedPolymer {
   is: string = "typed-polymer";
 
   public static register(name?: string) {
-    let proto = this.prototype;
+    let proto: TypedPolymer = this.prototype;
 
     if (!name) {
       let className = proto.constructor.toString().match(/(?:function )?([a-z_$][\w_$]+)/i);
@@ -87,26 +111,7 @@ export class TypedPolymer {
       createDomModule.call(this);
     }
     if (proto.tpListeners) {
-      var ready: Function = proto.ready;
-
-      proto.ready = function () {
-        Object
-          .keys(proto.tpListeners)
-          .forEach(eventName =>
-            Object
-              .keys(proto.tpListeners[eventName])
-              .forEach(selector => {
-                (Polymer.Settings.useShadow ? this["root"] : this)
-                  .addEventListener(
-                    eventName,
-                    ifMatches(selector, this[proto.tpListeners[eventName][selector]])
-                  )
-              })
-          );
-        if (ready) {
-          ready.call(this);
-        }
-      };
+      initializeListeners.call(this);
     }
 
     Polymer(proto);
@@ -199,7 +204,7 @@ export function once(eventName: string): PropertyDecorator {
       this.unlisten(event ? this.$[target] : this, event || eventName, `__once_${propName}`);
     };
     instance.listeners[eventName] = `__once_${propName}`;
-  }
+  };
 }
 
 export function on(eventName: string, selector: string = "*"): PropertyDecorator {
