@@ -1,4 +1,4 @@
-import {TypedPolymer, on, template} from "../src/TSComponent";
+import {TypedPolymer, on, template, set} from "../src/TSComponent";
 import DomApi = polymer.DomApi;
 
 chai.should();
@@ -13,6 +13,12 @@ chai.should();
   </div>
 </div>`)
 class TestComponentOn extends TypedPolymer {
+  @set(false) initialized: boolean;
+
+  ready(): void {
+    this.initialized = true;
+  }
+  
   @on("test")
   basicEvent(): void {
     this.basicEvent["n"]++;
@@ -85,6 +91,7 @@ function testSuite(target: string, ...methods: string[]): () => void {
 }
 
 describe("Decorator@on", function () {
+  it("should run the `ready` method when component is ready", () => element.initialized.should.be.true);
   it("should fire basic event callback", testSuite("*", "basicEvent"));
   it("should fire an id specific event", testSuite("#ok", "idEvent"));
   it("should fire a selector based event", testSuite("h1", "selector1"));

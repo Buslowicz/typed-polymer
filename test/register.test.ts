@@ -13,7 +13,6 @@ describe("TypedPolymer", function() {
     TestComponentRegisterNamed.register("test-component-named");
     var namedElement: TestComponentRegisterNamed = <any>document.createElement("test-component-named");
 
-
     it("should register the component under the class name (converted to kebab-case)", function() {
       expect(element).to.exist;
       element.is.should.equal("test-component-register");

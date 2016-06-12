@@ -87,6 +87,8 @@ export class TypedPolymer {
       createDomModule.call(this);
     }
     if (proto.tpListeners) {
+      var ready: Function = proto.ready;
+
       proto.ready = function () {
         Object
           .keys(proto.tpListeners)
@@ -101,6 +103,9 @@ export class TypedPolymer {
                   )
               })
           );
+        if (ready) {
+          ready.call(this);
+        }
       };
     }
 
@@ -146,6 +151,8 @@ export function behavior(behavior: Function|Object): ClassDecorator {
 }
 
 function setTypeValue(options: polymer.PropObjectType, value: any) {
+  // TODO: handle non-primitive values (not to be shared across multiple instances)
+  // TODO: add option for the value to be shared
   let types: Function[] = [String, Boolean, Number, Date, Array];
   if (!value) {
     return;
