@@ -1,4 +1,4 @@
-import {TypedPolymer} from "../src/TSComponent";
+import {TypedPolymer} from "../src/typed-polymer";
 
 chai.should();
 const expect = chai.expect;

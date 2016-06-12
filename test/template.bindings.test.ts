@@ -1,4 +1,4 @@
-import {TypedPolymer, set, template} from "../src/TSComponent";
+import {TypedPolymer, set, template} from "../src/typed-polymer";
 import DomApi = polymer.DomApi;
 
 chai.should();

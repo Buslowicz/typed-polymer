@@ -1,4 +1,4 @@
-import {TypedPolymer} from "../TSComponent";
+import {TypedPolymer} from "../typed-polymer";
 const NAMES = {};
 const CACHE = {};
 

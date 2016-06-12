@@ -1,4 +1,4 @@
-import {TypedPolymer, set} from "../src/TSComponent";
+import {TypedPolymer, set} from "../src/typed-polymer";
 
 chai.should();
 
