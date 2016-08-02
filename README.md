@@ -33,9 +33,9 @@ Besides of default Polymer features, Typed Polymer introduces:
 
 ### Property decorators
 * @set(value: any, forceType?: polymer.PropConstructorType) - set a default `value` (this also sets a `type`)
-* @reflectToAttribute - set `reflectToAttribute` to false
-* @readOnly - set `readOnly` to false
-* @notify - set `notify` to false
+* @reflectToAttribute - set `reflectToAttribute` to true
+* @readOnly - set `readOnly` to true
+* @notify - set `notify` to true
 
 ### Method decorator
 * @set(observed: string, type: polymer.PropConstructorType) - create a computed property (observed properties may be omitted, will then be taken from method arguments)
