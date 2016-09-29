@@ -4,7 +4,7 @@ var sourceMaps = require("gulp-sourcemaps");
 var sass = require("gulp-sass");
 var autoprefixer = require("gulp-autoprefixer");
 
-var BUILD_DIR = ".build";
+var BUILD_DIR = "dist";
 
 gulp.task("sass:dev", ["lint:scss"], function () {
   return gulp

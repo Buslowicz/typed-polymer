@@ -2,7 +2,7 @@ var gulp = require("gulp");
 
 var rename = require("gulp-rename");
 
-var BUILD_DIR = ".build";
+var BUILD_DIR = "dist";
 
 gulp.task("copy:assets", function () {
   return gulp
