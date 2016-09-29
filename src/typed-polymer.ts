@@ -115,11 +115,15 @@ export class TypedPolymer {
     let proto: TypedPolymer = this.prototype;
 
     if (!name) {
-      let className = proto.constructor.toString().match(/(?:function )?([a-z_$][\w_$]+)/i);
-      if (!className || className[0] === className[1]) {
-        throw new TypeError("Class has no name");
+      var constructor = proto.constructor;
+      name = constructor["name"];
+      if (!name) {
+        let className = constructor.toString().match(/(?:function )?([a-z_$][\w_$]+)/i);
+        if (!className || className[0] === className[1]) {
+          throw new TypeError("Class has no name");
+        }
+        name = className[1];
       }
-      name = className[1];
     }
 
     proto.constructorName = name;
