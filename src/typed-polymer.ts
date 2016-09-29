@@ -48,6 +48,8 @@ function setStyles(proto: TypedPolymer, module: DomModule) {
     module.appendChild(templateElement);
   }
 
+  let firstChild: Element = templateElement.firstElementChild;
+
   proto.styles.forEach(style => {
     let styleElement: HTMLStyleElement = document.createElement("style");
     if (isCustomStyle.test(style)) {
@@ -56,8 +58,7 @@ function setStyles(proto: TypedPolymer, module: DomModule) {
       styleElement.innerHTML = style;
     }
 
-    // TODO: prepend instead of append
-    templateElement.appendChild(styleElement);
+    templateElement.insertBefore(styleElement, firstChild);
   });
 }
 
