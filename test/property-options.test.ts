@@ -15,7 +15,7 @@ class TestComponentPropertyOptions extends TypedPolymer {
 
 TestComponentPropertyOptions.register();
 
-const element: TestComponentPropertyOptions = <any>document.createElement("test-component-property-options");
+const element: TestComponentPropertyOptions = <any>document.createElement(TestComponentPropertyOptions.moduleID);
 
 describe("Decorator@readOnly", function () {
   var properties: any = element.properties;

@@ -23,7 +23,7 @@ class TestComponentTemplate extends TypedPolymer {
 }
 TestComponentTemplate.register();
 
-const element: TestComponentTemplate = <any>document.createElement("test-component-template");
+const element: TestComponentTemplate = <any>document.createElement(TestComponentTemplate.moduleID);
 const elementDom: DomApi = Polymer.dom(element["root"]);
 
 describe("Decorator@template", function() {

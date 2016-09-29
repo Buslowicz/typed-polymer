@@ -25,9 +25,9 @@ class TestComponentMixedStyles extends TypedPolymer {
 TestComponentMixedStyles.register();
 
 const elements: TypedPolymer[] = [
-  <any>document.createElement("test-component-styles"),
-  <any>document.createElement("test-component-custom-styles"),
-  <any>document.createElement("test-component-mixed-styles")
+  <any>document.createElement(TestComponentStyles.moduleID),
+  <any>document.createElement(TestComponentCustomStyles.moduleID),
+  <any>document.createElement(TestComponentMixedStyles.moduleID)
 ];
 
 describe("Decorator@styles", function () {

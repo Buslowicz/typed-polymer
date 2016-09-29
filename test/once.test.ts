@@ -18,7 +18,7 @@ class TestComponentOnce extends TypedPolymer {
 
 TestComponentOnce.register();
 
-const element: TestComponentOnce = <any>document.createElement("test-component-once");
+const element: TestComponentOnce = <any>document.createElement(TestComponentOnce.moduleID);
 
 describe("Decorator@once", function () {
   it("should fire event marked as `once` only once", function () {

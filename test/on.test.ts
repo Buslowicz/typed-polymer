@@ -74,7 +74,7 @@ class TestComponentOn extends TypedPolymer {
 
 TestComponentOn.register();
 
-const element: TestComponentOn = <any>document.createElement("test-component-on");
+const element: TestComponentOn = <any>document.createElement(TestComponentOn.moduleID);
 const elementDom: DomApi = Polymer.dom(element["root"]);
 
 function testSuite(target: string, ...methods: string[]): () => void {

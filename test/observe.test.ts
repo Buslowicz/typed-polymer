@@ -31,7 +31,7 @@ class TestComponentObserve extends TypedPolymer {
 
 TestComponentObserve.register();
 
-const element: TestComponentObserve = <any>document.createElement("test-component-observe");
+const element: TestComponentObserve = <any>document.createElement(TestComponentObserve.moduleID);
 
 describe("Decorator@observe", function () {
   it("should fire single property observer if the property value changes", function () {

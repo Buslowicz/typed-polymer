@@ -30,7 +30,7 @@ class TestComponentSet extends TypedPolymer {
 
 TestComponentSet.register();
 
-const element: TestComponentSet = <any>document.createElement("test-component-set");
+const element: TestComponentSet = <any>document.createElement(TestComponentSet.moduleID);
 
 describe("Decorator@set", function () {
   var properties: any = element.properties;
