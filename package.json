@@ -1,9 +1,11 @@
 {
   "name": "typed-polymer",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Nothing in particular",
   "dependencies": {
     "Polymer": "^1.4.0",
+    "tslint": "^3.8.1",
+    "typescript": "^1.8.10",
     "webcomponents.js": "^0.7.22"
   },
   "devDependencies": {

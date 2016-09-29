@@ -1,4 +1,4 @@
-import {templateHooks} from "./hooks";
+import templateHooks from "./hooks/index";
 import PropConstructorType = polymer.PropConstructorType;
 
 export interface TypedPolymer extends polymer.Base {
@@ -39,10 +39,25 @@ function setStyles(proto: TypedPolymer, module: DomModule) {
   if (!Array.isArray(proto.styles)) {
     return;
   }
+
+  const isCustomStyle = /[\w]+(-[\w]+)+/;
+
+  let templateElement: Element = module.firstElementChild;
+  if (!templateElement) {
+    templateElement = document.createElement("template");
+    module.appendChild(templateElement);
+  }
+
   proto.styles.forEach(style => {
     let styleElement: HTMLStyleElement = document.createElement("style");
-    styleElement.innerHTML = style;
-    module.appendChild(styleElement);
+    if (isCustomStyle.test(style)) {
+      styleElement.setAttribute("include", style);
+    } else {
+      styleElement.innerHTML = style;
+    }
+
+    // TODO: prepend instead of append
+    templateElement.appendChild(styleElement);
   });
 }
 
@@ -51,8 +66,8 @@ function createDomModule() {
   let proto: TypedPolymer = this.prototype;
 
   module.id = proto.is;
-  setStyles(proto, module);
   setTemplate(proto, module);
+  setStyles(proto, module);
   module.register();
 }
 
@@ -127,7 +142,6 @@ export function template(template: string): ClassDecorator {
 }
 
 export function styles(styles: string[]): ClassDecorator {
-  // TODO: handle shared styles
   return target => {
     target.prototype.styles = styles;
   };
@@ -251,7 +265,7 @@ export function once(eventName: string): PropertyDecorator {
 export function on(eventName: string, selector: string = "*"): PropertyDecorator {
   // We don't use the Polymer native `listeners`. This is due to problems with different event callbacks order,
   // depending on whether using shady dom, or a shadow dom
-  if (/[^\.]+\.[^\.]+/.test(eventName)) {
+  if (/[^.]+\.[^.]+/.test(eventName)) {
     let eventData: string[] = eventName.split(".");
     selector = `#${eventData[0]}`;
     eventName = eventData[1];

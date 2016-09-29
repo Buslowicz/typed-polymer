@@ -5,6 +5,8 @@ export interface TemplateHook {
   callback: (match: string, p: string, i?: number) => string;
 }
 
-export var templateHooks: TemplateHook[] = [
+var templateHooks: TemplateHook[] = [
   expressionBinding
 ];
+
+export default templateHooks;
