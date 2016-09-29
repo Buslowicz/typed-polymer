@@ -23,5 +23,8 @@ describe("TypedPolymer", function() {
       namedElement.is.should.equal("test-component-named");
       namedElement["__isPolymerInstance__"].should.be.true;
     });
+    it("should hold component name (dash-cased) in moduleID static property of a class object", function() {
+      element.is.should.equal(TestComponentRegister.moduleID);
+    });
   });
 });

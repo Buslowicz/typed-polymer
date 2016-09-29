@@ -108,6 +108,7 @@ function initializeListeners(): void {
 
 export class TypedPolymer {
   is: string = "typed-polymer";
+  public static moduleID: string;
 
   public static register(name?: string) {
     let proto: TypedPolymer = this.prototype;
@@ -121,7 +122,7 @@ export class TypedPolymer {
     }
 
     proto.constructorName = name;
-    proto.is = name.replace(/([A-Z])/g, (_, char, i) => `${i ? "-" : ""}${char.toLowerCase()}`);
+    this.moduleID = proto.is = name.replace(/([A-Z])/g, (_, char, i) => `${i ? "-" : ""}${char.toLowerCase()}`);
 
     if (proto.template || proto.styles) {
       createDomModule.call(this);
