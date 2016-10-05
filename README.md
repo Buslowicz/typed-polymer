@@ -23,6 +23,15 @@ Besides of default Polymer features, Typed Polymer introduces:
 * **once** events
 * styles and template provided in decorators (which is also available in PolymerTS)
 
+### Creating an element
+Besides of a classical declarative way or using `document.createElement`, Polymer allows to use a fully imperative way.
+Typed Polymer goes more the factory way (`MyComponent.create(...)`). For now, however, TypeScript does not allow to [dynamically cast a type](https://github.com/Microsoft/TypeScript/issues/5863).
+Another problem is hinting arguments for factory/constructor (tried to make it work with passing constructor, no luck as well).
+**If you have any suggestions, please do not hesitate to create an issue.**
+
+The factory method will trigger a `factoryImpl` method as an additional step in a [lifecycle](https://www.polymer-project.org/1.0/docs/devguide/registering-elements#lifecycle-callbacks).
+To make it more ES6 class-like, Typed Polymer uses a `constructor` instead (still works the same as `factoryImpl`). Example of use below.
+
 ## Available decorators
 ### Class decorators
 * @template(template: string) - add a template to the component
@@ -59,12 +68,39 @@ class MyComponent extends TypedPolymer {}
 MyComponent.register("my-new-name"); // will register `my-new-name`
 ```
 
+### Creating an instance
+There are 3 ways of creating an instance.
+
+Little preparation
+```TypeScript
+class MyComponent extends TypedPolymer {
+  constructor() {
+    // will be called as factoryImpl
+  }
+}
+MyComponent.register();
+```
+
+#### Declarative
+```html
+<my-component></my-component>
+```
+
+#### Imperative (using `document.createElement`)
+```TypeScript
+document.CreateElement("my-component")
+```
+
+#### Imperative (using a factory method)
+```TypeScript
+MyComponent.create()
+```
+
 ### @template
 Provide an HTML template, as a string. Currently templates have to be inline, but will be possible to provide a path to a template
 ```TypeScript
 @template(`<h1>Hello World!</h1>`)
-class MyComponent extends TypedPolymer
-{
+class MyComponent extends TypedPolymer {
   // ...
 }
 MyComponent.register();
@@ -74,8 +110,7 @@ MyComponent.register();
 Provide a list of styles (contents for the `<style>` tags)
 ```TypeScript
 @styles([`:host {display: none} h1 {display: flex}`])
-class MyComponent extends TypedPolymer
-{
+class MyComponent extends TypedPolymer {
   // ...
 }
 MyComponent.register();
@@ -85,8 +120,7 @@ MyComponent.register();
 Extend native HTML elements
 ```TypeScript
 @extend("button")
-class MyComponent extends TypedPolymer
-{
+class MyComponent extends TypedPolymer {
   // ...
 }
 MyComponent.register();
@@ -96,8 +130,7 @@ MyComponent.register();
 Static attributes on host
 ```TypeScript
 @hostAttributes({ contenteditable: true })
-class MyComponent extends TypedPolymer
-{
+class MyComponent extends TypedPolymer {
   // ...
 }
 ```
@@ -106,8 +139,7 @@ class MyComponent extends TypedPolymer
 Add a behavior to the component
 ```TypeScript
 @behavior(MyBehavior)
-class MyComponent extends TypedPolymer
-{
+class MyComponent extends TypedPolymer {
   // ...
 }
 ```
