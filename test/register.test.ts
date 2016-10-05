@@ -26,5 +26,8 @@ describe("TypedPolymer", function() {
     it("should hold component name (dash-cased) in moduleID static property of a class object", function() {
       element.is.should.equal(TestComponentRegister.moduleID);
     });
+    it("should create a valid object using a factory", function() {
+      Object.keys(TestComponentRegister.create()).should.contain("root").and.contain("customStyle");
+    });
   });
 });

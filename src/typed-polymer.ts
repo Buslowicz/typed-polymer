@@ -110,9 +110,12 @@ function initializeListeners(): void {
 export class TypedPolymer {
   is: string = "typed-polymer";
   public static moduleID: string;
+  private static polymerConstructor;
+  static create(...args) {return new (Function.prototype.bind.apply(this.polymerConstructor, [null].concat(args)))}
 
   public static register(name?: string) {
     let proto: TypedPolymer = this.prototype;
+    proto.factoryImpl = <(...args: any[]) => void>proto.constructor;
 
     if (!name) {
       var constructor = proto.constructor;
@@ -136,7 +139,7 @@ export class TypedPolymer {
       initializeListeners.call(this);
     }
 
-    Polymer(proto);
+    this.polymerConstructor = Polymer(proto);
   }
 }
 
