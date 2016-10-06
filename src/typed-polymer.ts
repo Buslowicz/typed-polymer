@@ -1,26 +1,44 @@
 import templateHooks from "./hooks/index";
 import PropConstructorType = polymer.PropConstructorType;
 
+/**
+ * TypedPolymer interface that extends polymer.Base interface. It is mandatory, to make TypeScript believe
+ * that TypedPolymer extends polymer.Base. In practice, it is all done by Polymer factory so no need to do anything.
+ * We also declare additional properties to make TypedPolymer features work.
+ */
 export interface TypedPolymer extends polymer.Base {
-  template?: string;
-  styles?: string[];
-  constructorName: string;
+  template?: string;          // template string for the component
+  styles?: string[];          // list of styles to apply
+  constructorName: string;    // a helper function holding
 
+  // map of function names assigned to selector per event name
   tpListeners: {[eventName: string]: {[selector: string]: string}};
 }
 
+/**
+ * Class decorator interface
+ */
 interface ClassDecorator {
-  (instance: {prototype: TypedPolymer}): any;
+  (instance: TypedPolymer & Function): any;
 }
 
+/**
+ * Property decorator interface
+ */
 interface PropertyDecorator {
   (instance: TypedPolymer, propName: string): any;
 }
 
+/**
+ * DomModule interface
+ */
 interface DomModule extends HTMLElement {
   register: () => void;
 }
 
+/**
+ * Creates the template element and adds the template to it (uses template hooks)
+ */
 function setTemplate(proto: TypedPolymer, module: DomModule) {
   if (!(typeof proto.template === "string")) {
     return;
@@ -29,12 +47,16 @@ function setTemplate(proto: TypedPolymer, module: DomModule) {
   let templateElement: Element = document.createElement("template");
   let template: string = proto.template;
 
+  // use every declared template hook
   templateHooks.forEach(hook => template = template.replace(new RegExp(hook.pattern, "g"), hook.callback.bind(proto)));
   templateElement.innerHTML = template;
 
   module.appendChild(templateElement);
 }
 
+/**
+ * Creates style elements with either a css content, or if it's a shared style name, add it
+ */
 function setStyles(proto: TypedPolymer, module: DomModule) {
   if (!Array.isArray(proto.styles)) {
     return;
@@ -42,6 +64,7 @@ function setStyles(proto: TypedPolymer, module: DomModule) {
 
   const isCustomStyle = /[\w]+(-[\w]+)+/;
 
+  // we need to add styles inside a template tag, so if it doesn't exist, we need to create it
   let templateElement: Element = module.firstElementChild;
   if (!templateElement) {
     templateElement = document.createElement("template");
@@ -50,6 +73,7 @@ function setStyles(proto: TypedPolymer, module: DomModule) {
 
   let firstChild: Element = templateElement.firstElementChild;
 
+  // iterate over provided styles
   proto.styles.forEach(style => {
     let styleElement: HTMLStyleElement = document.createElement("style");
     if (isCustomStyle.test(style)) {
@@ -62,6 +86,9 @@ function setStyles(proto: TypedPolymer, module: DomModule) {
   });
 }
 
+/**
+ * Create a DomModule element, add template and styles and register it
+ */
 function createDomModule() {
   let module: DomModule = <DomModule>document.createElement("dom-module");
   let proto: TypedPolymer = this.prototype;
@@ -72,17 +99,25 @@ function createDomModule() {
   module.register();
 }
 
+/**
+ * Generates a handler function that filters targets by selector
+ */
 function ifMatches(selector: string, callback: EventListener): EventListener {
   return <EventListener>function (ev, detail) {
     if (!(<HTMLElement>ev.target).matches(selector)) {
       return;
     }
+
+    // if a callback returns false, prevent other callbacks from being called
     if (callback.call(this.host || this, ev, detail) === false) {
       ev.stopImmediatePropagation();
     }
   };
 }
 
+/**
+ * Initialize event listeners
+ */
 function initializeListeners(): void {
   let proto: TypedPolymer = this.prototype;
   var ready: Function = proto.ready;
@@ -107,16 +142,29 @@ function initializeListeners(): void {
   };
 }
 
+/**
+ * The heart of TypedPolymer
+ */
 export class TypedPolymer {
   is: string = "typed-polymer";
-  public static moduleID: string;
-  private static polymerConstructor;
-  static create(...args) {return new (Function.prototype.bind.apply(this.polymerConstructor, [null].concat(args)))}
+  public static moduleID: string;     // holds the kebab-cased name of the component (like `my-element`)
+  private static polymerConstructor;  // the constructor used to create the element using the `new` keyword
 
+  /**
+   * Factory to create instances imperatively
+   */
+  static create(...args) {
+    return new (Function.prototype.bind.apply(this.polymerConstructor, [null].concat(args)));
+  }
+
+  /**
+   * A function to register an element within a browser (and Polymer)
+   */
   public static register(name?: string) {
     let proto: TypedPolymer = this.prototype;
-    proto.factoryImpl = <(...args: any[]) => void>proto.constructor;
+    proto.factoryImpl = <(...args: any[]) => void>proto.constructor;  // we use a constructor as factoryImpl
 
+    // try to guess the name if it was not provided
     if (!name) {
       var constructor = proto.constructor;
       name = constructor["name"];
@@ -129,57 +177,82 @@ export class TypedPolymer {
       }
     }
 
-    proto.constructorName = name;
+    // CamelCased name
+    proto.constructorName = name; // TODO: make sure it's CamelCase
+
+    // kebab-cased name
     this.moduleID = proto.is = name.replace(/([A-Z])/g, (_, char, i) => `${i ? "-" : ""}${char.toLowerCase()}`);
 
+    // create a DomModule if template or styles were provided
     if (proto.template || proto.styles) {
       createDomModule.call(this);
     }
+
+    // attach event listeners if they were declared
     if (proto.tpListeners) {
       initializeListeners.call(this);
     }
 
+    // saving the imperative constructor
     this.polymerConstructor = Polymer(proto);
   }
 }
 
-// TypedPolymer decorators
+// ------------ TypedPolymer decorators ------------ //
+
+/**
+ * Provide a template to the element
+ */
 export function template(template: string): ClassDecorator {
   return target => {
     target.prototype.template = template;
   };
 }
 
+/**
+ * Provide list of styles to the element
+ */
 export function styles(styles: string[]): ClassDecorator {
   return target => {
     target.prototype.styles = styles;
   };
 }
 
-// Polymer Element decorators
+/**
+ * Declare which element we extend
+ */
 export function extend(baseElement: string): ClassDecorator {
   return target => {
     target.prototype.extends = baseElement;
   };
 }
 
+/**
+ * Set host attributes for the element
+ */
 export function hostAttributes(map: {[name: string]: any}): ClassDecorator {
   return target => {
     target.prototype.hostAttributes = map;
   };
 }
 
-export function behavior(behavior: Function|Object): ClassDecorator {
+/**
+ * Add a behavior to the element
+ */
+export function behavior(behavior: Function & Object): ClassDecorator {
   if (!behavior) {
     throw new ReferenceError("Behavior decorator has to be given a behavior (Function/Class or Object)");
   }
   return target => {
     let prototype: TypedPolymer = target.prototype;
     prototype.behaviors = prototype.behaviors || [];
-    prototype.behaviors.push((<Function>behavior).prototype || behavior);
+    prototype.behaviors.push(behavior.prototype || behavior);
   };
 }
 
+/**
+ * Function to set the type and value for the property
+ */
 function setTypeValue(options: polymer.PropObjectType, value: any, forceType: polymer.PropConstructorType) {
   let types: Function[] = [String, Boolean, Number, Date, Array];
 
@@ -205,7 +278,9 @@ function setTypeValue(options: polymer.PropObjectType, value: any, forceType: po
   }
 }
 
-// Polymer properties decorators
+/**
+ * Set the property default value (type can be forced or taken from the value)
+ */
 export function set(value: any, forceType?: polymer.PropConstructorType): PropertyDecorator {
   let options: polymer.PropObjectType = <polymer.PropObjectType>{};
   return (instance, propName) => {
@@ -241,24 +316,39 @@ export function set(value: any, forceType?: polymer.PropConstructorType): Proper
   };
 }
 
+/**
+ * Set a desired boolean flag (option)
+ */
 function setOption(instance, propName, option): void {
   instance.properties = instance.properties || {};
   instance.properties[propName] = instance.properties[propName] || {};
   instance.properties[propName][option] = true;
 }
 
+/**
+ * Set `reflectToAttribute` flag
+ */
 export function reflectToAttribute(instance, propName) {
   setOption(instance, propName, "reflectToAttribute");
 }
 
+/**
+ * Set `readOnly` flag
+ */
 export function readOnly(instance, propName) {
   setOption(instance, propName, "readOnly");
 }
 
+/**
+ * Set `notify` flag
+ */
 export function notify(instance, propName) {
   setOption(instance, propName, "notify");
 }
 
+/**
+ * Declare an event that will trigger only once
+ */
 export function once(eventName: string): PropertyDecorator {
   return (instance, propName) => {
     instance.listeners = instance.listeners || {};
@@ -271,6 +361,9 @@ export function once(eventName: string): PropertyDecorator {
   };
 }
 
+/**
+ * Declare an event listener with a selector filter
+ */
 export function on(eventName: string, selector: string = "*"): PropertyDecorator {
   // We don't use the Polymer native `listeners`. This is due to problems with different event callbacks order,
   // depending on whether using shady dom, or a shadow dom
@@ -289,6 +382,9 @@ export function on(eventName: string, selector: string = "*"): PropertyDecorator
   };
 }
 
+/**
+ * Observe a single or multiple property/path
+ */
 export function observe(observed: string): PropertyDecorator {
   return ~observed.indexOf(",") || ~observed.indexOf(".") ?
     // observing multiple properties or path
