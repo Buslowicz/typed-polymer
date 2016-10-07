@@ -19,7 +19,7 @@ export interface TypedPolymer extends polymer.Base {
  * Class decorator interface
  */
 interface ClassDecorator {
-  (instance: TypedPolymer & Function): any;
+  (instance: {prototype: TypedPolymer}): any;
 }
 
 /**
@@ -178,7 +178,7 @@ export class TypedPolymer {
     }
 
     // CamelCased name
-    proto.constructorName = name; // TODO: make sure it's CamelCase
+    proto.constructorName = name.replace(/-(\w)|^(\w)/g, (_, w1, w2) => (w1 || w2).toUpperCase());
 
     // kebab-cased name
     this.moduleID = proto.is = name.replace(/([A-Z])/g, (_, char, i) => `${i ? "-" : ""}${char.toLowerCase()}`);
