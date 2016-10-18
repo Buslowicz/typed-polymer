@@ -1,42 +1,81 @@
 {
   "name": "typed-polymer",
-  "version": "0.0.2",
-  "description": "Nothing in particular",
-  "dependencies": {
-    "Polymer": "^1.4.0",
-    "tslint": "^3.8.1",
-    "typescript": "^2.0.0",
-    "webcomponents.js": "^0.7.22"
+  "version": "0.1.0",
+  "description": "A TypeScript based Polymer components, with extended functionality.",
+  "keywords": [
+    "Polymer",
+    "TypeScript",
+    "Decorators"
+  ],
+  "config": {
+    "app": {
+      "entry": "typed-polymer",
+      "src": "./src",
+      "dist": "./dist",
+      "formats": [
+        "es",
+        "iife",
+        "iife:min",
+        "umd",
+        "umd:min"
+      ]
+    },
+    "tests": {
+      "entry": "tests",
+      "src": "./test",
+      "dist": "./dist-test",
+      "formats": [
+        "iife"
+      ],
+      "outFile": "tests.js"
+    }
+  },
+  "homepage": "http://draccoz.github.io/typed-polymer/",
+  "bugs": "https://github.com/Draccoz/typed-polymer/issues",
+  "license": "MIT",
+  "author": {
+    "email": "draccoz+typescript@gmail.com",
+    "name": "Daniel \"Dracco\" Busłowicz",
+    "url": "https://github.com/Draccoz"
+  },
+  "main": "dist/typed-polymer.umd.js",
+  "jsnext:main": "dist/typed-polymer.es6.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Draccoz/typed-polymer"
+  },
+  "engines": {
+    "node": ">=6.0.0"
   },
   "devDependencies": {
-    "browser-sync": "2.11.1",
+    "@types/chai": "^3.4.34",
+    "@types/mocha": "^2.2.32",
+    "@types/polymer": "^1.1.28",
+    "@types/webcomponents.js": "^0.6.30",
     "chai": "^3.5.0",
-    "del": "2.2.0",
-    "gulp": "3.9.0",
-    "gulp-autoprefixer": "3.1.0",
-    "gulp-debug": "^2.1.2",
-    "gulp-rename": "1.2.2",
-    "gulp-sass": "2.1.1",
-    "gulp-sass-lint": "1.1.1",
-    "gulp-sourcemaps": "1.6.0",
-    "gulp-tslint": "4.3.1",
-    "gulp-typedoc": "1.2.1",
-    "gulp-typescript": "2.13.0",
-    "gulp-uglify": "1.5.1",
-    "gulp-webpack": "^1.5.0",
-    "lodash": "latest",
+    "del": "^2.2.2",
+    "gulp": "^3.9.1",
+    "gulp-empty": "^0.1.1",
+    "gulp-rename": "^1.2.2",
+    "gulp-sourcemaps": "^2.1.1",
+    "gulp-tslint": "^6.1.2",
+    "gulp-uglify": "^2.0.0",
+    "lodash": "^4.16.4",
     "mocha": "^2.5.3",
-    "require-dir": "0.3.0",
-    "run-sequence": "1.1.5",
-    "through2": "latest",
-    "ts-loader": "^0.8.2",
-    "tslint": "3.8.1",
-    "typescript": "1.8.10",
-    "vinyl-named": "^1.1.0",
-    "webpack": "latest"
+    "open": "0.0.5",
+    "rollup-plugin-typescript": "^0.8.1",
+    "rollup-stream": "^1.14.0",
+    "tslint": "^3.15.1",
+    "typescript": "^2.0.0",
+    "vinyl-buffer": "^1.0.0",
+    "vinyl-source-stream": "^1.1.0"
   },
   "scripts": {
-    "start": "gulp develop"
-  },
-  "author": "Draccoz"
+    "build": "echo 'compile everything'",
+    "postbuild": "echo 'minify'",
+    "prestart": "export DEVELOP=true && npm build",
+    "start": "echo 'run watchers'",
+    "pretest": "npm build",
+    "test": "echo 'run tests'"
+  }
 }

@@ -2,6 +2,8 @@ import {TypedPolymer, set} from "../src/typed-polymer";
 
 chai.should();
 
+/* tslint:disable:member-ordering */
+
 class TestComponentSet extends TypedPolymer {
   @set(true) booleanValue: boolean;
   @set(50) numberValue: number;
@@ -15,7 +17,7 @@ class TestComponentSet extends TypedPolymer {
   @set(String) stringType: string;
   @set(Object) objectType: any;
   @set(Array) arrayType: any[];
-  
+
   @set(1) n1: number;
   @set(2) n2: number;
   @set(Number) computed1(n1: number, n2: number): number {

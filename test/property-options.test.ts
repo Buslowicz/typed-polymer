@@ -1,6 +1,4 @@
 import {TypedPolymer, set, readOnly, notify, reflectToAttribute} from "../src/typed-polymer";
-import PropConstructorType = polymer.PropConstructorType;
-import PropObjectType = polymer.PropObjectType;
 
 chai.should();
 
@@ -21,11 +19,11 @@ describe("Decorator@readOnly", function () {
   var properties: any = element.properties;
 
   it("should set the readOnly flag for property", function () {
-    properties.readOnlyProp.readOnly.should.be.true;
+    properties.readOnlyProp.readOnly.should.equal(true);
   });
 
   it("should set the readOnly flag for property when decorators are called in reversed order", function () {
-    properties.readOnlyProp2.readOnly.should.be.true;
+    properties.readOnlyProp2.readOnly.should.equal(true);
   });
 });
 
@@ -33,11 +31,11 @@ describe("Decorator@notify", function () {
   var properties: any = element.properties;
 
   it("should set the notify flag for property", function () {
-    properties.notifyProp.notify.should.be.true;
+    properties.notifyProp.notify.should.equal(true);
   });
 
   it("should set the notify flag for property when decorators are called in reversed order", function () {
-    properties.notifyProp2.notify.should.be.true;
+    properties.notifyProp2.notify.should.equal(true);
   });
 });
 
@@ -45,10 +43,10 @@ describe("Decorator@reflectToAttribute", function () {
   var properties: any = element.properties;
 
   it("should set the reflectToAttribute flag for property", function () {
-    properties.reflectToAttributeProp.reflectToAttribute.should.be.true;
+    properties.reflectToAttributeProp.reflectToAttribute.should.equal(true);
   });
 
   it("should set the reflectToAttribute flag for property when decorators are called in reversed order", function () {
-    properties.reflectToAttributeProp2.reflectToAttribute.should.be.true;
+    properties.reflectToAttributeProp2.reflectToAttribute.should.equal(true);
   });
 });

@@ -1,11 +1,17 @@
 {
   "name": "typed-polymer",
-  "description": "Nothing in particular",
+  "description": "A TypeScript based Polymer components, with extended functionality.",
+  "main": "dist/typed-polymer.umd.js",
   "authors": [
-    "Draccoz"
+    "Daniel \"Dracco\" Busłowicz"
   ],
   "license": "MIT",
-  "homepage": "",
+  "keywords": [
+    "Polymer",
+    "TypeScript",
+    "Decorators"
+  ],
+  "homepage": "https://github.com/Draccoz/typed-polymer",
   "ignore": [
     "**/.*",
     "node_modules",
@@ -13,7 +19,8 @@
     "test",
     "tests"
   ],
-  "dependencies": {
-    "polymer": "1.4.0"
+  "devDependencies": {
+    "polymer": "^1.4.0",
+    "webcomponentsjs": "^0.7.22"
   }
 }

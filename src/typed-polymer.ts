@@ -18,14 +18,14 @@ export interface TypedPolymer extends polymer.Base {
 /**
  * Class decorator interface
  */
-interface ClassDecorator {
+export interface ClassDecorator {
   (instance: {prototype: TypedPolymer}): any;
 }
 
 /**
  * Property decorator interface
  */
-interface PropertyDecorator {
+export interface PropertyDecorator {
   (instance: TypedPolymer, propName: string): any;
 }
 
@@ -146,9 +146,9 @@ function initializeListeners(): void {
  * The heart of TypedPolymer
  */
 export class TypedPolymer {
-  is: string = "typed-polymer";
   public static moduleID: string;     // holds the kebab-cased name of the component (like `my-element`)
-  private static polymerConstructor;  // the constructor used to create the element using the `new` keyword
+  private static polymerConstructor: TypedPolymer;  // the constructor used to create the element using `new` keyword
+  public is: string = "typed-polymer";
 
   /**
    * Factory to create instances imperatively
@@ -194,7 +194,7 @@ export class TypedPolymer {
     }
 
     // saving the imperative constructor
-    this.polymerConstructor = Polymer(proto);
+    this.polymerConstructor = <any>Polymer(proto);
   }
 }
 

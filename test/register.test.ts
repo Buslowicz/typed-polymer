@@ -16,12 +16,12 @@ describe("TypedPolymer", function() {
     it("should register the component under the class name (converted to kebab-case)", function() {
       expect(element).to.exist;
       element.is.should.equal("test-component-register");
-      element["__isPolymerInstance__"].should.be.true;
+      element["__isPolymerInstance__"].should.equal(true);
     });
     it("should register the component under given name if provided", function () {
       expect(namedElement).to.exist;
       namedElement.is.should.equal("test-component-named");
-      namedElement["__isPolymerInstance__"].should.be.true;
+      namedElement["__isPolymerInstance__"].should.equal(true);
     });
     it("should hold component name (dash-cased) in moduleID static property of a class object", function() {
       element.is.should.equal(TestComponentRegister.moduleID);
