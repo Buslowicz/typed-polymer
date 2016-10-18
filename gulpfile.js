@@ -1,34 +1,37 @@
 const del = require("del");
 const gulp = require("gulp");
-const rollup = require("rollup-stream");
-const sourcemaps = require("gulp-sourcemaps");
 const uglify = require("gulp-uglify");
 const nop = require("gulp-empty");
+const sourcemaps = require("gulp-sourcemaps");
+const tsLint = require("gulp-tslint");
 const rename = require("gulp-rename");
-const source = require("vinyl-source-stream");
 const buffer = require("vinyl-buffer");
+const rollup = require("rollup-stream");
+const source = require("vinyl-source-stream");
 const typescript = require("rollup-plugin-typescript");
 const _ = require("lodash");
 
-const tsLint = require("gulp-tslint");
-
-const pkg = require("./package.json");
-
-const entryPoint = "./src/typed-polymer.ts";
-
-const srcDir = "./src/**/*.ts";
-const srcDest = "./dist";
-const bundles = [
-  "es",
-  "iife",
-  "iife:min",
-  "umd",
-  "umd:min"
-];
-
-const testDir = "./test/**/*.ts";
-const testFormat = "iife";
-const testDest = "./dist-test";
+const CONFIG = {
+  app: {
+    entry: "typed-polymer",
+    src: "./src",
+    dist: "./dist",
+    formats: [
+      "es",
+      "iife",
+      "iife:min",
+      "umd",
+      "umd:min"
+    ]
+  },
+  tests: {
+    entry: "tests",
+    src: "./test",
+    dist: "./dist-test",
+    formats: ["iife"],
+    outFile: "tests.js"
+  }
+};
 
 function lint(src) {
   return () => new Promise((resolve, reject) => gulp.src(src)
@@ -39,57 +42,59 @@ function lint(src) {
   );
 }
 
-function build({name, entryPoint, srcDir, outFile, dist = "./dist", format = "umd", minify = false}) {
+function build({main, src, outFile, dist, format, minify = false}) {
+  let mainPath = `${src}/${main}.ts`;
+
   return new Promise((resolve) => rollup({
-    entry: entryPoint,
-    moduleName: _.capitalize(_.camelCase(name)),
+    entry: mainPath,
+    moduleName: _.capitalize(_.camelCase(main)),
     sourceMap: true,
     format: format,
     plugins: [
       typescript({
         typescript: require("typescript"),
-        include: srcDir
+        include: `**/*.ts`
       })
     ]
   })
-    .pipe(source(entryPoint))
+    .pipe(source(mainPath))
     .pipe(buffer())
     .pipe(sourcemaps.init({loadMaps: true}))
     .pipe(minify ? uglify() : nop())
-    .pipe(rename(outFile || `${name}.${format}${minify ? ".min" : ""}.js`))
+    .pipe(rename(outFile || `${main}.${format}${minify ? ".min" : ""}.js`))
     .pipe(sourcemaps.write("."))
     .pipe(gulp.dest(dist))
     .on("end", resolve));
 }
 
-let tasks = [];
-bundles.forEach(function (bundle) {
-  let [format, minify] = bundle.split(":");
-  tasks.push(build.bind(null, {
-    entryPoint, srcDir,
-    name: pkg.name,
-    format: format,
-    minify: minify
-  }));
+function generateBuildTask({name, config, actions}) {
+  gulp.task(name, () => del([`${config.dist}/**`]).then(lint(`${config.src}/**/*.ts`))
+    .then(() => Promise.all(config.formats.map((bundle) => {
+      let [format, minify] = bundle.split(":");
+
+      return build({
+        main: config.entry,
+        src: config.src,
+        dist: config.dist,
+        format: format,
+        minify: minify,
+
+        outFile: config.outFile
+      });
+    })))
+    .then(actions && (() => Promise.all(actions.map(action => action()))))
+    .catch(err => console.error(err.message)));
+}
+
+generateBuildTask({name: "build", config: CONFIG.app});
+
+generateBuildTask({
+  name: "build-tests", config: CONFIG.tests, actions: [() => {
+    return new Promise((resolve, reject) => {
+      let config = CONFIG.tests;
+      gulp.src([`${config.src}/!(*.ts)`]).pipe(gulp.dest(config.dist)).on("end", resolve).on("error", reject);
+    });
+  }]
 });
-
-gulp.task("build", () => del([`${srcDest}/**`]).then(lint(srcDir))
-  .then(() => Promise.all(tasks.map(build => build())))
-  .catch(err => console.error(err.message)));
-
-gulp.task("build-tests", () => del([`${testDest}/**`]).then(lint(testDir))
-  .then(build.bind(null, {
-    entryPoint: "./test/tests.ts",
-    testDir,
-    name: `tests`,
-    format: testFormat,
-    dist: testDest,
-    outFile: 'tests.js'
-
-  }))
-  .then(() => new Promise((resolve, reject) => {
-    gulp.src(["./test/!(*.ts)"]).pipe(gulp.dest(testDest)).on("end", resolve).on("error", reject);
-  }))
-  .catch(err => console.error(err.message)));
 
 // TODO: serve tests
