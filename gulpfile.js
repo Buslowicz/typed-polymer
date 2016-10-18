@@ -1,5 +1,8 @@
+const fs = require("fs");
 const del = require("del");
 const gulp = require("gulp");
+const open = require("open");
+const http = require("http");
 const uglify = require("gulp-uglify");
 const nop = require("gulp-empty");
 const sourcemaps = require("gulp-sourcemaps");
@@ -69,12 +72,33 @@ function generateBuildTask({name, config, actions}) {
 generateBuildTask({name: "build", config: CONFIG.app});
 
 generateBuildTask({
-  name: "build-tests", config: CONFIG.tests, actions: [() => {
-    return new Promise((resolve, reject) => {
-      let config = CONFIG.tests;
-      gulp.src([`${config.src}/!(*.ts)`]).pipe(gulp.dest(config.dist)).on("end", resolve).on("error", reject);
-    });
-  }]
+  name: "build-tests", config: CONFIG.tests, actions: [() => new Promise((resolve, reject) => {
+    gulp.src([`${CONFIG.tests.src}/!(*.ts)`]).pipe(gulp.dest(CONFIG.tests.dist)).on("end", resolve).on("error", reject);
+  })]
 });
 
-// TODO: serve tests
+gulp.task("serve-tests", (cb) => {
+  http.createServer(function (req, res) {
+    let url = req.url;
+    if (url === "/") {
+      url = "/index.html";
+    }
+    if (url.startsWith("/bower_components") || url.startsWith("/node_modules")) {
+      url = `.${url}`;
+    } else {
+      url = `${CONFIG.tests.dist}${url}`;
+    }
+    fs.readFile(url, (err, file) => {
+      if (err) {
+        if (err.code === "ENOENT") {
+          res.writeHead(404);
+        } else {
+          res.writeHead(500);
+        }
+        res.end(err.message);
+      }
+      res.end(file);
+    });
+  }).listen(3000);
+  open("http://localhost:3000");
+});

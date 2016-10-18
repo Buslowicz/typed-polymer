@@ -12,13 +12,21 @@
       "entry": "typed-polymer",
       "src": "./src",
       "dist": "./dist",
-      "formats": ["es", "iife", "iife:min", "umd", "umd:min" ]
+      "formats": [
+        "es",
+        "iife",
+        "iife:min",
+        "umd",
+        "umd:min"
+      ]
     },
     "tests": {
       "entry": "tests",
       "src": "./test",
-      "dist": "./dist-test" ,
-      "formats": ["iife"],
+      "dist": "./dist-test",
+      "formats": [
+        "iife"
+      ],
       "outFile": "tests.js"
     }
   },
@@ -54,6 +62,7 @@
     "gulp-uglify": "^2.0.0",
     "lodash": "^4.16.4",
     "mocha": "^2.5.3",
+    "open": "0.0.5",
     "rollup-plugin-typescript": "^0.8.1",
     "rollup-stream": "^1.14.0",
     "tslint": "^3.15.1",
