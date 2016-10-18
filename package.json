@@ -72,7 +72,7 @@
   },
   "scripts": {
     "build": "tsc && gulp build",
-    "prepublish": "npm test && npm build",
+    "prepublish": "gulp build && gulp build-tests",
     "pretest": "gulp build-tests",
     "test": "gulp serve-tests"
   }
