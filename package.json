@@ -71,11 +71,9 @@
     "vinyl-source-stream": "^1.1.0"
   },
   "scripts": {
-    "build": "echo 'compile everything'",
-    "postbuild": "echo 'minify'",
-    "prestart": "export DEVELOP=true && npm build",
-    "start": "echo 'run watchers'",
-    "pretest": "npm build",
-    "test": "echo 'run tests'"
+    "build": "tsc && gulp build",
+    "prepublish": "npm test && npm build",
+    "pretest": "gulp build-tests",
+    "test": "gulp serve-tests"
   }
 }
