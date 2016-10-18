@@ -7,7 +7,7 @@ class TestComponentObserve extends TypedPolymer {
   @set(20) y: number;
   @set(30) z: number;
   @set({a: 1, b: 1, c: 1})  v: any;
-  
+
   @observe("x")
   singleProp(): void {
     this.singleProp["n"]++;

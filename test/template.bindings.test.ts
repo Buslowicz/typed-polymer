@@ -28,7 +28,6 @@ const elementDom: DomApi = Polymer.dom(element["root"]);
 
 describe("Decorator@template", function() {
   it("should contain the `H1` tag", function() {
-    //noinspection BadExpressionStatementJS
     expect(elementDom.querySelector("h1")).to.not.be.null;
   });
 

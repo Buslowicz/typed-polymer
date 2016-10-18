@@ -1,9 +1,8 @@
 import {TypedPolymer, template, styles} from "../src/typed-polymer";
-import DomApi = polymer.DomApi;
 
 chai.should();
 
-@styles([':host {position: absolute}'])
+@styles([":host {position: absolute}"])
 class TestSampleSharedStyle extends TypedPolymer {
 }
 TestSampleSharedStyle.register();

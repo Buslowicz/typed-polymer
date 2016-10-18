@@ -18,7 +18,7 @@ class TestComponentOn extends TypedPolymer {
   ready(): void {
     this.initialized = true;
   }
-  
+
   @on("test")
   basicEvent(): void {
     this.basicEvent["n"]++;
@@ -87,10 +87,11 @@ function testSuite(target: string, ...methods: string[]): () => void {
       let [methodName, expected = elementDom.querySelectorAll(selector).length + ""] = method.split(":");
       element[methodName]["n"].should.equal(parseInt(expected));
     });
-  }
+  };
 }
-
 describe("Decorator@on", function () {
+  /* tslint:disable:max-line-length */
+
   it("should run the `ready` method when component is ready", () => element.initialized.should.be.true);
   it("should fire basic event callback", testSuite("*", "basicEvent"));
   it("should fire an id specific event", testSuite("#ok", "idEvent"));
