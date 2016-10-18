@@ -6,12 +6,23 @@
     "moduleResolution": "node",
     "noImplicitAny": false,
     "removeComments": false,
-    "sourceMap": true,
-    "suppressImplicitAnyIndexErrors": true,
-    "target": "es5"
+    "sourceMap": false,
+    "target": "es5",
+    "outDir": "dist",
+    "lib": [
+      "dom",
+      "es6"
+    ],
+    "declaration": true,
+    "declarationDir": "types"
   },
   "exclude": [
     "dist",
-    "node_modules"
+    "dist-test",
+    "node_modules",
+    "types"
   ]
 }
+
+
+

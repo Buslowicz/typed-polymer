@@ -1,8 +1,8 @@
 typings
 dist
+dist-test
 bower_components
 node_modules
-.build
 .idea
 .tmp
 npm-debug.log
@@ -18,3 +18,4 @@ test/*.js
 release
 report.tap
 version.jenkins
+/types/
