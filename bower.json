@@ -1,5 +1,6 @@
 {
   "name": "typed-polymer",
+  "version": "0.1.0",
   "description": "A TypeScript based Polymer components, with extended functionality.",
   "main": "dist/typed-polymer.umd.js",
   "authors": [
@@ -13,11 +14,8 @@
   ],
   "homepage": "https://github.com/Draccoz/typed-polymer",
   "ignore": [
-    "**/.*",
     "node_modules",
-    "bower_components",
-    "test",
-    "tests"
+    "bower_components"
   ],
   "devDependencies": {
     "polymer": "^1.4.0",
