@@ -7,6 +7,21 @@
     "TypeScript",
     "Decorators"
   ],
+  "config": {
+    "app": {
+      "entry": "typed-polymer",
+      "src": "./src",
+      "dist": "./dist",
+      "formats": ["es", "iife", "iife:min", "umd", "umd:min" ]
+    },
+    "tests": {
+      "entry": "tests",
+      "src": "./test",
+      "dist": "./dist-test" ,
+      "formats": ["iife"],
+      "outFile": "tests.js"
+    }
+  },
   "homepage": "http://draccoz.github.io/typed-polymer/",
   "bugs": "https://github.com/Draccoz/typed-polymer/issues",
   "license": "MIT",

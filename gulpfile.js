@@ -11,27 +11,7 @@ const source = require("vinyl-source-stream");
 const typescript = require("rollup-plugin-typescript");
 const _ = require("lodash");
 
-const CONFIG = {
-  app: {
-    entry: "typed-polymer",
-    src: "./src",
-    dist: "./dist",
-    formats: [
-      "es",
-      "iife",
-      "iife:min",
-      "umd",
-      "umd:min"
-    ]
-  },
-  tests: {
-    entry: "tests",
-    src: "./test",
-    dist: "./dist-test",
-    formats: ["iife"],
-    outFile: "tests.js"
-  }
-};
+const CONFIG = require("./package.json").config;
 
 function lint(src) {
   return () => new Promise((resolve, reject) => gulp.src(src)
