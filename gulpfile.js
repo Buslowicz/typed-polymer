@@ -87,7 +87,7 @@ gulp.task("serve-tests", () => {
     if (url.startsWith("/bower_components") || url.startsWith("/node_modules")) {
       url = `.${url}`;
     } else {
-      url = `${CONFIG.tests.dist}${url.substr(0, url.indexOf("?")) || url}`;
+      url = `${CONFIG.tests.dist}${url}`;
     }
     fs.readFile(url, (err, file) => {
       if (err) {
