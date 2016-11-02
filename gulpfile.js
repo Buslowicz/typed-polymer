@@ -86,11 +86,12 @@ gulp.task("serve-tests", (cb) => {
     if (url.startsWith("/bower_components") || url.startsWith("/node_modules")) {
       url = `.${url}`;
     } else {
-      url = `${CONFIG.tests.dist}${url}`;
+      url = `${CONFIG.tests.dist}${url.substr(0, url.indexOf("?")) || url}`;
     }
     fs.readFile(url, (err, file) => {
       if (err) {
         if (err.code === "ENOENT") {
+          console.log(err, url);
           res.writeHead(404);
         } else {
           res.writeHead(500);
