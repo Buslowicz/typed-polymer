@@ -77,9 +77,10 @@ generateBuildTask({
   })]
 });
 
-gulp.task("serve-tests", (cb) => {
+gulp.task("serve-tests", () => {
   http.createServer(function (req, res) {
     let url = req.url;
+    url = url.substr(0, url.indexOf("?")) || url;
     if (url === "/") {
       url = "/index.html";
     }
