@@ -1,5 +1,6 @@
 import templateHooks from "./hooks/index";
 import PropConstructorType = polymer.PropConstructorType;
+import CustomElementConstructor = webcomponents.CustomElementConstructor;
 
 /**
  * TypedPolymer interface that extends polymer.Base interface. It is mandatory, to make TypeScript believe
@@ -16,10 +17,19 @@ export interface TypedPolymer extends polymer.Base {
 }
 
 /**
+ * Static members of TypedPolymer interface
+ */
+export interface TypedPolymerStatic {
+  prototype: TypedPolymer;
+  moduleID: string;
+  polymerConstructor: CustomElementConstructor;
+}
+
+/**
  * Class decorator interface
  */
 export interface ClassDecorator {
-  (instance: {prototype: TypedPolymer}): any;
+  (instance: TypedPolymerStatic): any;
 }
 
 /**
@@ -143,11 +153,51 @@ function initializeListeners(): void {
 }
 
 /**
+ * A function to register an element within a browser (and Polymer)
+ */
+function registerComponent(name: string, target: TypedPolymerStatic): void {
+  let proto: TypedPolymer = target.prototype;
+  proto.factoryImpl = <(...args: any[]) => void>proto.constructor;  // we use a constructor as factoryImpl
+
+  // try to guess the name if it was not provided
+  if (!name) {
+    var constructor = proto.constructor;
+    name = constructor["name"];
+    if (!name) {
+      let className = constructor.toString().match(/(?:function )?([a-z_$][\w_$]+)/i);
+      if (!className || className[0] === className[1]) {
+        throw new TypeError("Class has no name");
+      }
+      name = className[1];
+    }
+  }
+
+  // CamelCased name
+  proto.constructorName = name.replace(/-(\w)|^(\w)/g, (_, w1, w2) => (w1 || w2).toUpperCase());
+
+  // kebab-cased name
+  target.moduleID = proto.is = name.replace(/([A-Z])/g, (_, char, i) => `${i ? "-" : ""}${char.toLowerCase()}`);
+
+  // create a DomModule if template or styles were provided
+  if (proto.template || proto.styles) {
+    createDomModule.call(target);
+  }
+
+  // attach event listeners if they were declared
+  if (proto.tpListeners) {
+    initializeListeners.call(target);
+  }
+
+  // saving the imperative constructor
+  target.polymerConstructor = Polymer(proto);
+}
+
+/**
  * The heart of TypedPolymer
  */
 export class TypedPolymer {
   public static moduleID: string;     // holds the kebab-cased name of the component (like `my-element`)
-  private static polymerConstructor: TypedPolymer;  // the constructor used to create the element using `new` keyword
+  public static polymerConstructor: CustomElementConstructor;  // the constructor used to create the element using `new` keyword
   public is: string = "typed-polymer";
 
   /**
@@ -161,44 +211,23 @@ export class TypedPolymer {
    * A function to register an element within a browser (and Polymer)
    */
   public static register(name?: string) {
-    let proto: TypedPolymer = this.prototype;
-    proto.factoryImpl = <(...args: any[]) => void>proto.constructor;  // we use a constructor as factoryImpl
-
-    // try to guess the name if it was not provided
-    if (!name) {
-      var constructor = proto.constructor;
-      name = constructor["name"];
-      if (!name) {
-        let className = constructor.toString().match(/(?:function )?([a-z_$][\w_$]+)/i);
-        if (!className || className[0] === className[1]) {
-          throw new TypeError("Class has no name");
-        }
-        name = className[1];
-      }
-    }
-
-    // CamelCased name
-    proto.constructorName = name.replace(/-(\w)|^(\w)/g, (_, w1, w2) => (w1 || w2).toUpperCase());
-
-    // kebab-cased name
-    this.moduleID = proto.is = name.replace(/([A-Z])/g, (_, char, i) => `${i ? "-" : ""}${char.toLowerCase()}`);
-
-    // create a DomModule if template or styles were provided
-    if (proto.template || proto.styles) {
-      createDomModule.call(this);
-    }
-
-    // attach event listeners if they were declared
-    if (proto.tpListeners) {
-      initializeListeners.call(this);
-    }
-
-    // saving the imperative constructor
-    this.polymerConstructor = <any>Polymer(proto);
+    // this method is static and the `this` object will contain a static props/methods
+    // TypeScript is not really aware of that so we have to cast it. TypedPolymer however, is not assignable
+    // to TypedPolymerStatic, so we have to cast it to `any` first
+    registerComponent(name, <TypedPolymerStatic><any> this);
   }
 }
 
 // ------------ TypedPolymer decorators ------------ //
+export function register(target: TypedPolymerStatic): void;
+export function register(name?: string): ClassDecorator;
+export function register(arg) {
+  if (typeof arg === "string") {
+    return registerComponent.bind(null, arg);
+  } else {
+    registerComponent(null, arg);
+  }
+}
 
 /**
  * Provide a template to the element

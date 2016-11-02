@@ -77,9 +77,10 @@ generateBuildTask({
   })]
 });
 
-gulp.task("serve-tests", (cb) => {
+gulp.task("serve-tests", () => {
   http.createServer(function (req, res) {
     let url = req.url;
+    url = url.substr(0, url.indexOf("?")) || url;
     if (url === "/") {
       url = "/index.html";
     }
@@ -91,6 +92,7 @@ gulp.task("serve-tests", (cb) => {
     fs.readFile(url, (err, file) => {
       if (err) {
         if (err.code === "ENOENT") {
+          console.log(err, url);
           res.writeHead(404);
         } else {
           res.writeHead(500);
