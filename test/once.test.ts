@@ -1,7 +1,5 @@
 import {TypedPolymer, template, once} from "../src/typed-polymer";
 
-chai.should();
-
 @template(`<h1 id="h1">Hello World!</h1>`)
 class TestComponentOnce extends TypedPolymer {
   @once("test")

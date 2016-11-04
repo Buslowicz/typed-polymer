@@ -1,0 +1,6 @@
+{
+  "suites": [
+    "dist-test/shady.html",
+    "dist-test/shadow.html"
+  ]
+}
