@@ -7,6 +7,15 @@ This is how the Typed Polymer was born. The only issue for now is Polymer 2.0, w
 
 **Note2:** Typed Polymer does **NOT** support legacy browsers, and will never ever do (unless I get paid millions).
 
+## Instalation
+```
+npm install --save typed-polymer
+```
+or
+```
+bower install --save typed-polymer
+```
+
 ## Features
 Besides of default Polymer features, Typed Polymer introduces:
 
