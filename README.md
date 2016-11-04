@@ -1,7 +1,7 @@
 # Typed Polymer
 TypedPolymer is a TypeScript based Polymer components framework. It was inspired by [PolymerTS](https://github.com/nippur72/PolymerTS), the concept was a bit different though. Instead of only using Polymer features and base it on HTML5 imports, my concept was to create a JS/TS import structure and add features I've personally been missing in Polymer.
 
-This is how the Typed Polymer was born. It is still building up and I'd love to hear some ideas and requests. Some things I consider interesting are queued up already in Issues, so feel free to read up. The only issue for now is Polymer 2.0, which kinda defeats the purpose of this kind of libraries. Nevertheless I will try to make it worthy even in that case.
+This is how the Typed Polymer was born. The only issue for now is Polymer 2.0, which kinda defeats the purpose of this kind of libraries. For now (as nobody actually uses TypedPolymer?), I consider this project as a proof-of-concept, though it can be used in production (but it's better to wait for Polymer 2). For any questions or suggestions, make an issue :). Also, feel free to fork it and do whatever you like. The project is licences as MIT and I require no credits on redistribution (though would be nice ^^).
 
 **Note:** Typed Polymer embraces the power of [Decorators](https://github.com/Microsoft/TypeScript-Handbook/blob/master/pages/Decorators.md) in order to work. If you cannot use them by any reason, please do not use this library.
 
