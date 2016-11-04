@@ -197,7 +197,7 @@ function registerComponent(name: string, target: TypedPolymerStatic): void {
  */
 export class TypedPolymer {
   public static moduleID: string;     // holds the kebab-cased name of the component (like `my-element`)
-  public static polymerConstructor: CustomElementConstructor;  // the constructor used to create the element using `new` keyword
+  public static polymerConstructor: CustomElementConstructor;  // the constructor used to create the element using `new`
   public is: string = "typed-polymer";
 
   /**

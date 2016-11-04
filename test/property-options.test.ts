@@ -1,7 +1,5 @@
 import {TypedPolymer, set, readOnly, notify, reflectToAttribute} from "../src/typed-polymer";
 
-chai.should();
-
 class TestComponentPropertyOptions extends TypedPolymer {
   @set(Number) @readOnly readOnlyProp: number;
   @readOnly @set(Number) readOnlyProp2: number;

@@ -1,8 +1,6 @@
 import {TypedPolymer, on, template, set} from "../src/typed-polymer";
 import DomApi = polymer.DomApi;
 
-chai.should();
-
 @template(`
 <h1>Hello World!</h1>
 <div class="deep">

@@ -1,7 +1,5 @@
 import {TypedPolymer, set, template} from "../src/typed-polymer";
 import DomApi = polymer.DomApi;
-
-chai.should();
 const expect = chai.expect;
 
 @template(`

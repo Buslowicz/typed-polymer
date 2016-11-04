@@ -1,7 +1,5 @@
 import {TypedPolymer, template, styles} from "../src/typed-polymer";
 
-chai.should();
-
 @styles([":host {position: absolute}"])
 class TestSampleSharedStyle extends TypedPolymer {
 }

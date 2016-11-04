@@ -1,6 +1,4 @@
 import {TypedPolymer, register} from "../src/typed-polymer";
-
-chai.should();
 const expect = chai.expect;
 
 describe("TypedPolymer", function() {

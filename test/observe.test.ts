@@ -1,7 +1,5 @@
 import {TypedPolymer, set, observe} from "../src/typed-polymer";
 
-chai.should();
-
 class TestComponentObserve extends TypedPolymer {
   @set(10) x: number;
   @set(20) y: number;
