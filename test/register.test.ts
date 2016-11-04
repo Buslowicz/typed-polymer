@@ -13,18 +13,19 @@ describe("TypedPolymer", function() {
   describe("#register()", function() {
     class TestComponentRegister extends TypedPolymer {}
     TestComponentRegister.register();
-    var element: TypedPolymer = <any>document.createElement(TestComponentRegister.moduleID);
+    const element: TypedPolymer = <any>document.createElement(TestComponentRegister.moduleID);
 
     class TestComponentRegisterNamed extends TypedPolymer {}
     TestComponentRegisterNamed.register("test-component-named");
-    var namedElement: TypedPolymer = <any>document.createElement(TestComponentRegisterNamed.moduleID);
+    const namedElement: TypedPolymer = <any>document.createElement(TestComponentRegisterNamed.moduleID);
 
     @register class TestComponentRegisterDecorator extends TypedPolymer {}
-    var elementDecorator: TypedPolymer = <any>document.createElement(TestComponentRegisterDecorator.moduleID);
+    const elementDecorator: TypedPolymer = <any>document.createElement(TestComponentRegisterDecorator.moduleID);
 
     @register("test-component-register-named-decor")
     class TestComponentRegisterDecoratorNamed extends TypedPolymer {}
-    var elementDecoratorNamed: TypedPolymer = <any>document.createElement(TestComponentRegisterDecoratorNamed.moduleID);
+    const elementDecoratorNamed: TypedPolymer =
+      <any>document.createElement(TestComponentRegisterDecoratorNamed.moduleID);
 
     it("should register the component under the class name (converted to kebab-case)", isValidComponent(
       element, "test-component-register"

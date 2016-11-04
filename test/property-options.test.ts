@@ -14,7 +14,7 @@ TestComponentPropertyOptions.register();
 const element: TestComponentPropertyOptions = <any>document.createElement(TestComponentPropertyOptions.moduleID);
 
 describe("Decorator@readOnly", function () {
-  var properties: any = element.properties;
+  const properties: any = element.properties;
 
   it("should set the readOnly flag for property", function () {
     properties.readOnlyProp.readOnly.should.equal(true);
@@ -26,7 +26,7 @@ describe("Decorator@readOnly", function () {
 });
 
 describe("Decorator@notify", function () {
-  var properties: any = element.properties;
+  const properties: any = element.properties;
 
   it("should set the notify flag for property", function () {
     properties.notifyProp.notify.should.equal(true);
@@ -38,7 +38,7 @@ describe("Decorator@notify", function () {
 });
 
 describe("Decorator@reflectToAttribute", function () {
-  var properties: any = element.properties;
+  const properties: any = element.properties;
 
   it("should set the reflectToAttribute flag for property", function () {
     properties.reflectToAttributeProp.reflectToAttribute.should.equal(true);

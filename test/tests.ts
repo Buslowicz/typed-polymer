@@ -6,3 +6,4 @@ import "./on.test";
 import "./once.test";
 import "./property-options.test";
 import "./style.test";
+import "./importHTML.test";
