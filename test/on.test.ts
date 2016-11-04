@@ -76,7 +76,7 @@ const element: TestComponentOn = <any>document.createElement(TestComponentOn.mod
 const elementDom: DomApi = Polymer.dom(element["root"]);
 
 function testSuite(target: string, ...methods: string[]): () => void {
-  var [selector, eventName = "test"] = target.split(";");
+  let [selector, eventName = "test"] = target.split(";");
   return () => {
     methods.forEach(method => element[method.split(":")[0]]["n"] = 0);
     let allNodes: Node[] = elementDom.querySelectorAll("*");

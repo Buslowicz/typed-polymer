@@ -75,7 +75,7 @@
   },
   "scripts": {
     "build": "gulp build",
-    "prepublish": "wct && gulp build && gulp build-tests",
+    "prepublish": "gulp build && gulp build-tests && wct",
     "pretest": "gulp build-tests",
     "test": "wct"
   }

@@ -429,3 +429,14 @@ export function observe(observed: string): PropertyDecorator {
       (<polymer.PropObjectType>instance.properties[observed]).observer = propName;
     };
 }
+
+/**
+ * Import an html file (component) and return a promise which executes on load/error
+ */
+export function importHTML(path: string): Promise<Event> {
+  return new Promise((resolve, reject) => {
+    let link = Polymer["Base"].importHref(path);
+    link.onload = resolve;
+    link.onerror = reject;
+  });
+}

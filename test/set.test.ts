@@ -32,7 +32,7 @@ TestComponentSet.register();
 const element: TestComponentSet = <any>document.createElement(TestComponentSet.moduleID);
 
 describe("Decorator@set", function () {
-  var properties: any = element.properties;
+  const properties: any = element.properties;
 
   it("should set a proper type and a value", function () {
     properties.booleanValue.type.should.equal(Boolean);
